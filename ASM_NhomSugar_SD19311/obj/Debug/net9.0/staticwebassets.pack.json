@@ -1,0 +1,53 @@
+{
+  "Files": [
+    {
+      "Id": "D:\\C#6\\ASM_NhomSugar_SD19311\\wwwroot\\css\\home.css",
+      "PackagePath": "staticwebassets\\css\\home.css"
+    },
+    {
+      "Id": "D:\\C#6\\ASM_NhomSugar_SD19311\\wwwroot\\css\\login.css",
+      "PackagePath": "staticwebassets\\css\\login.css"
+    },
+    {
+      "Id": "D:\\C#6\\ASM_NhomSugar_SD19311\\wwwroot\\css\\register.css",
+      "PackagePath": "staticwebassets\\css\\register.css"
+    },
+    {
+      "Id": "D:\\C#6\\ASM_NhomSugar_SD19311\\wwwroot\\css\\site.css",
+      "PackagePath": "staticwebassets\\css\\site.css"
+    },
+    {
+      "Id": "D:\\C#6\\ASM_NhomSugar_SD19311\\wwwroot\\images\\banner1.png",
+      "PackagePath": "staticwebassets\\images\\banner1.png"
+    },
+    {
+      "Id": "D:\\C#6\\ASM_NhomSugar_SD19311\\wwwroot\\images\\banner2.jpg",
+      "PackagePath": "staticwebassets\\images\\banner2.jpg"
+    },
+    {
+      "Id": "D:\\C#6\\ASM_NhomSugar_SD19311\\wwwroot\\images\\banner3.jpg",
+      "PackagePath": "staticwebassets\\images\\banner3.jpg"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.ASM_NhomSugar_SD19311.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.ASM_NhomSugar_SD19311.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.build.ASM_NhomSugar_SD19311.props",
+      "PackagePath": "build\\ASM_NhomSugar_SD19311.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.buildMultiTargeting.ASM_NhomSugar_SD19311.props",
+      "PackagePath": "buildMultiTargeting\\ASM_NhomSugar_SD19311.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.buildTransitive.ASM_NhomSugar_SD19311.props",
+      "PackagePath": "buildTransitive\\ASM_NhomSugar_SD19311.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

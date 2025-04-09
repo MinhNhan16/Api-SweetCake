@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\ASM_NhomSugar_SD19311.props" />
+</Project>

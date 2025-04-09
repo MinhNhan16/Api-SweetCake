@@ -1,0 +1,87 @@
+﻿@page "/register"
+@namespace ASM_NhomSugar_SD19311.Pages
+@using ASM_NhomSugar_SD19311.DTO
+@using ASM_NhomSugar_SD19311.Model
+@using Microsoft.AspNetCore.Components.Forms
+@using ASM_NhomSugar_SD19311.Pages
+@inject HttpClient Http
+@inject NavigationManager Navigation
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="css/register.css" rel="stylesheet" />
+<div class="container mt-5">
+    <h3 class="mb-3">Đăng ký</h3>
+    <p class="text-muted">Vui lòng nhập thông tin đăng ký của bạn</p>
+
+    <EditForm Model="@account" OnValidSubmit="HandleRegister">
+        <DataAnnotationsValidator />
+        <div class="form-group mb-3">
+            <label for="username">Username:</label>
+            <InputText id="username" class="form-control" @bind-Value="account.Username" />
+            <ValidationMessage For="@(() => account.Username)" class="text-danger" />
+        </div>
+        <div class="form-group mb-3">
+            <label for="email">Email:</label>
+            <InputText id="email" type="email" class="form-control" @bind-Value="account.Email" />
+            <ValidationMessage For="@(() => account.Email)" class="text-danger" />
+        </div>
+        <div class="form-group mb-3">
+            <label for="password">Password:</label>
+            <InputText id="password" type="password" class="form-control" @bind-Value="account.Password" />
+            <ValidationMessage For="@(() => account.Password)" class="text-danger" />
+        </div>
+        <div class="form-group mb-3">
+            <label for="fullname">Full Name:</label>
+            <InputText id="fullname" class="form-control" @bind-Value="account.FullName" />
+            <ValidationMessage For="@(() => account.FullName)" class="text-danger" />
+        </div>
+        <div class="form-group mb-3">
+            <label for="phone">Phone:</label>
+            <InputText id="phone" class="form-control" @bind-Value="account.Phone" />
+            <ValidationMessage For="@(() => account.Phone)" class="text-danger" />
+        </div>
+        <div class="form-group mb-3">
+            <label for="address">Address:</label>
+            <InputText id="address" class="form-control" @bind-Value="account.Address" />
+            <ValidationMessage For="@(() => account.Address)" class="text-danger" />
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Đăng ký</button>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <p class="mt-3 @(isSuccess ? "text-success" : "text-danger")">@message</p>
+    }
+</div>
+
+@code {
+    private RegisterRequest account = new() { Role = "Customer" };
+    private string message = string.Empty;
+    private bool isSuccess;
+
+    private async Task HandleRegister()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("https://localhost:44366/api/account/register", account);
+            if (response.IsSuccessStatusCode)
+            {
+                message = "Đăng ký thành công!";
+                isSuccess = true;
+                await Task.Delay(2000);
+                Navigation.NavigateTo("/login");
+            }
+            else
+            {
+                message = await response.Content.ReadAsStringAsync();
+                isSuccess = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            message = $"Lỗi: {ex.Message}";
+            isSuccess = false;
+        }
+    }
+
+
+}
