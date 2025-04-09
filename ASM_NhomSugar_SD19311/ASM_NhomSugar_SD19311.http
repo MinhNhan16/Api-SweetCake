@@ -1,6 +1,0 @@
-@ASM_NhomSugar_SD19311_HostAddress = http://localhost:5168
-
-GET {{ASM_NhomSugar_SD19311_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
