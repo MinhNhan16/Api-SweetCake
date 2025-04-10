@@ -1,0 +1,142 @@
+﻿@page "/login"
+@using ASM_NhomSugar_SD19311.DTO
+@using Microsoft.AspNetCore.Components.Forms
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="css/login.css" rel="stylesheet" />
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h3>Đăng Nhập</h3>
+            <p class="text-muted">Vui lòng nhập thông tin đăng nhập của bạn</p>
+        </div>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @errorMessage
+                <button type="button" class="btn-close" @onclick="() => errorMessage = string.Empty"></button>
+            </div>
+        }
+
+        <EditForm Model="@loginModel" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <InputText id="email" class="form-control" @bind-Value="loginModel.Email" />
+                <ValidationMessage For="@(() => loginModel.Email)" />
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Mật khẩu</label>
+                <InputText id="password" type="password" class="form-control" @bind-Value="loginModel.Password" />
+                <ValidationMessage For="@(() => loginModel.Password)" />
+            </div>
+
+            <div class="d-grid mb-3 gap-2">
+                <button type="submit" class="btn btn-primary" disabled="@isLoading">
+                    @if (isLoading)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                    }
+                    Đăng Nhập
+                </button>
+            </div>
+        </EditForm>
+
+        <div class="auth-footer">
+            <p>Chưa có tài khoản? <a href="/register">Đăng ký ngay</a></p>
+            <a href="/forgot-password">Quên mật khẩu?</a>
+        </div>
+    </div>
+</div>
+
+@code {
+    private LoginRequest loginModel = new();
+    private string errorMessage = string.Empty;
+    private bool isLoading = false;
+
+    private async Task HandleValidSubmit()
+    {
+        isLoading = true;
+        errorMessage = string.Empty;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("https://localhost:44366/api/account/login", loginModel);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
+
+                if (result != null && result.User != null)
+                {
+                    // Lưu token và thông tin người dùng vào LocalStorage
+                    await LocalStorage.SetItemAsync("authToken", result.Token);
+                    await LocalStorage.SetItemAsync("userEmail", loginModel.Email);
+                    await LocalStorage.SetItemAsync("userRole", result.User.Role);
+                    await LocalStorage.SetItemAsync("customerId", result.User.Id);
+
+                    Console.WriteLine($"Login successful - Token: {result.Token}, Email: {loginModel.Email}");
+
+                    Http.DefaultRequestHeaders.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", result.Token);
+
+                    Navigation.NavigateTo("/", forceLoad: true);
+                }
+                else
+                {
+                    errorMessage = "Không nhận được thông tin người dùng từ máy chủ.";
+                }
+            }
+            else
+            {
+                errorMessage = await response.Content.ReadAsStringAsync();
+                if (string.IsNullOrWhiteSpace(errorMessage))
+                {
+                    errorMessage = "Email hoặc mật khẩu không đúng!";
+                }
+                Console.WriteLine($"Login failed: {errorMessage}");
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            errorMessage = "Không thể kết nối đến máy chủ";
+            Console.WriteLine($"Login error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Đã xảy ra lỗi không mong muốn";
+            Console.WriteLine($"Unexpected error: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+
+    // private class LoginResponse
+    // {
+    //     public string Token { get; set; }
+    // }
+    public class LoginResponse
+    {
+        public string Message { get; set; }
+        public string Token { get; set; }
+        public UserInfo User { get; set; }
+    }
+
+    public class UserInfo
+    {
+        public int Id { get; set; }
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string Role { get; set; }
+    }
+
+}

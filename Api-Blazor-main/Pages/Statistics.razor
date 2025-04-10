@@ -1,0 +1,204 @@
+﻿@page "/statistics"
+@using ASM_NhomSugar_SD19311.Service
+@using ASM_NhomSugar_SD19311.Helpers
+@using ChartJs.Blazor
+@using ChartJs.Blazor.ChartJS.Common
+@using ChartJs.Blazor.ChartJS.Common.Axes
+@using ChartJs.Blazor.ChartJS.Common.Properties
+@using ChartJs.Blazor.ChartJS.LineChart
+@using ChartJs.Blazor.ChartJS.PieChart
+@inject StatisticsService StatisticsService
+
+<!-- Add Tailwind CSS via CDN for simplicity (or use your build setup) -->
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+<div class="container mx-auto p-6">
+    <h3 class="mb-6 text-2xl font-bold text-gray-800">Thống kê</h3>
+
+    <!-- Total Stats Cards -->
+    <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+        <!-- Total Revenue -->
+        <div class="rounded-lg bg-white p-6 shadow-md">
+            <h5 class="text-lg font-semibold text-gray-700">Thu nhập trung bình</h5>
+            <p class="mt-2 text-2xl font-bold text-gray-900">@totalRevenue.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</p>
+        </div>
+
+        <!-- Total Customers -->
+        <div class="rounded-lg bg-white p-6 shadow-md">
+            <h5 class="text-lg font-semibold text-gray-700">Khách hàng trung bình</h5>
+            <p class="mt-2 text-2xl font-bold text-gray-900">@totalCustomers</p>
+        </div>
+
+        <!-- Total Orders -->
+        <div class="rounded-lg bg-white p-6 shadow-md">
+            <h5 class="text-lg font-semibold text-gray-700">Hoạt động</h5>
+            <p class="mt-2 text-2xl font-bold text-gray-900">@totalOrders</p>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+        <!-- Revenue Trend Line Chart -->
+        <div class="rounded-lg bg-white p-6 shadow-md">
+            <h5 class="mb-4 text-lg font-semibold text-gray-700">Thu nhập trung bình</h5>
+            @if (lineChartConfig != null)
+            {
+                <div class="h-64 w-full">
+                    <Chart Config="lineChartConfig" />
+                </div>
+            }
+            else
+            {
+                <p class="text-gray-500">Đang tải biểu đồ...</p>
+            }
+        </div>
+
+        <!-- Order Status Pie Chart -->
+        <div class="rounded-lg bg-white p-6 shadow-md">
+            <h5 class="mb-4 text-lg font-semibold text-gray-700">Tình trạng đơn hàng</h5>
+            @if (pieChartConfig != null)
+            {
+                <div class="flex h-64 w-full justify-center">
+                    <Chart Config="pieChartConfig" />
+                </div>
+            }
+            else
+            {
+                <p class="text-gray-500">Đang tải biểu đồ...</p>
+            }
+        </div>
+    </div>
+
+    <!-- Tables Section -->
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <!-- Top Customers Table -->
+        <div class="rounded-lg bg-white p-6 shadow-md">
+            <h5 class="mb-4 text-lg font-semibold text-gray-700">Đơn hàng (mức rút)</h5>
+            <div class="overflow-x-auto">
+                <table class="min-w-full border border-gray-200 bg-white">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="px-4 py-2 text-left text-gray-600">Người dùng</th>
+                            <th class="px-4 py-2 text-left text-gray-600">Sản phẩm</th>
+                            <th class="px-4 py-2 text-left text-gray-600">Tổng chi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (topCustomers != null && topCustomers.Any())
+                        {
+                            @foreach (var customer in topCustomers)
+                            {
+                                <tr class="border-t">
+                                    <td class="px-4 py-2 text-gray-700">@customer.Username</td>
+                                    <td class="px-4 py-2 text-gray-700">@customer.ProductName</td>
+                                    <td class="px-4 py-2 text-gray-700">@customer.TotalSpent.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3" class="px-4 py-2 text-center text-gray-500">Chưa có dữ liệu</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Top Products Table -->
+        <div class="rounded-lg bg-white p-6 shadow-md">
+            <h5 class="mb-4 text-lg font-semibold text-gray-700">Sản phẩm được mua nhiều nhất</h5>
+            <div class="overflow-x-auto">
+                <table class="min-w-full border border-gray-200 bg-white">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="px-4 py-2 text-left text-gray-600">Sản phẩm</th>
+                            <th class="px-4 py-2 text-left text-gray-600">Số lượng bán</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (topProducts != null && topProducts.Any())
+                        {
+                            @foreach (var product in topProducts)
+                            {
+                                <tr class="border-t">
+                                    <td class="px-4 py-2 text-gray-700">@product.ProductName</td>
+                                    <td class="px-4 py-2 text-gray-700">@product.QuantitySold</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="2" class="px-4 py-2 text-center text-gray-500">Chưa có dữ liệu</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private decimal totalRevenue;
+    private int totalCustomers;
+    private int totalOrders;
+    private Dictionary<string, decimal> revenueTrend;
+    private Dictionary<string, int> orderStatusDistribution;
+    private List<(string Username, string ProductName, decimal TotalSpent)> topCustomers;
+    private List<(string ProductName, int QuantitySold)> topProducts;
+
+    private LineConfig lineChartConfig = new LineConfig();
+    private PieConfig pieChartConfig = new PieConfig();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Fetch data
+            totalRevenue = await StatisticsService.GetTotalRevenueAsync();
+            totalCustomers = await StatisticsService.GetTotalCustomersAsync();
+            totalOrders = await StatisticsService.GetTotalOrdersAsync();
+            revenueTrend = await StatisticsService.GetRevenueTrendAsync() ?? new Dictionary<string, decimal>();
+            orderStatusDistribution = await StatisticsService.GetOrderStatusDistributionAsync() ?? new Dictionary<string, int>();
+            topCustomers = await StatisticsService.GetTopCustomersAsync() ?? new List<(string Username, string ProductName, decimal TotalSpent)>();
+            topProducts = await StatisticsService.GetTopProductsAsync() ?? new List<(string ProductName, int QuantitySold)>();
+
+            // Configure Line Chart
+            lineChartConfig.Data.Labels.AddRange(revenueTrend.Keys);
+            var dataset = new LineDataset<object>
+            {
+                Label = "Thu nhập trung bình",
+                BorderColor = "rgba(75, 192, 192, 1)",
+                Fill = false
+            };
+            dataset.AddRange(revenueTrend.Values.Select(v => (object)(double)v));
+            lineChartConfig.Data.Datasets.Add(dataset);
+
+            // Configure Pie Chart
+            pieChartConfig = new PieConfig
+            {
+                Options = new PieOptions
+                {
+                    Responsive = true
+                }
+            };
+
+            var statusLabels = orderStatusDistribution.Keys.Select(k => EnumHelper.GetOrderStatusDisplayName(k)).ToList();
+            pieChartConfig.Data.Labels.AddRange(statusLabels);
+
+            var pieDataset = new PieDataset
+            {
+                BackgroundColor = new[] { "#FF6384", "#36A2EB", "#FFCE56" }
+            };
+            pieDataset.Data.AddRange(orderStatusDistribution.Values.Select(v => (double)v));
+            pieChartConfig.Data.Datasets.Add(pieDataset);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading statistics: {ex.Message}");
+        }
+    }
+}

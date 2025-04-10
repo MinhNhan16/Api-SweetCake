@@ -1,0 +1,159 @@
+﻿@page "/layout"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<!-- Include Tailwind CSS and Slick Carousel -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick-theme.min.css" integrity="sha512-17EgCFERpgZKcm0j0fEq1YCJuyAWdz9KUtv1EjVuaOz8pDnh/0nZxmU6BBXwaaxqoi9PQXnRWqlcDB027hgv9A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css" integrity="sha512-yHknP1/AwR+yx26cB1y0cjvQUMvEa2PFzt1c9LlS4pRQ5NOTZFWbhBig+X9G9eYW/8m0/4OXNx8pxJ6z57x0dw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script src="https://cdn.tailwindcss.com"></script>
+
+@if (!isLoading && userRole != "Admin")
+{
+    <div class="flex h-screen items-center justify-center">
+        <p class="text-lg text-red-500">Đang chuyển hướng... Bạn không có quyền truy cập trang này.</p>
+    </div>
+}
+else if (isLoading)
+{
+    <div class="flex h-screen items-center justify-center">
+        <p class="text-lg text-gray-500">Đang tải...</p>
+    </div>
+}
+else
+{
+    <div class="flex h-screen flex-col">
+        <!-- Header -->
+        <header class="bg-gradient-to-r border-b border-pink-800 from-pink-200 to-purple-300 p-4 shadow-md">
+            <div class="container mx-auto flex items-center justify-between">
+                <div class="text-xl font-bold text-white">
+                    <span>🎂 SUGAR</span>
+                </div>
+                <div class="text-sm text-white">
+                    Xin chào, @userEmail | <a href="/logout" class="underline hover:text-gray-200" @onclick="Logout">Đăng xuất</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar and Main Content -->
+        <div class="flex flex-1 overflow-hidden">
+            <!-- Sidebar -->
+            <nav class="w-52 border-r border-pink-200 bg-pink-50 p-4">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="/" class="flex items-center rounded p-2 text-pink-600 transition-colors hover:bg-pink-100 hover:text-pink-800">
+                            <span class="mr-2 text-2xl">🏠</span>
+                            <span>Trang chủ</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/user" class="flex items-center rounded p-2 text-pink-600 transition-colors hover:bg-pink-100 hover:text-pink-800">
+                            <span class="mr-2 text-2xl">👥</span>
+                            <span>Người dùng</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/product" class="flex items-center rounded p-2 text-pink-600 transition-colors hover:bg-pink-100 hover:text-pink-800">
+                            <span class="mr-2 text-2xl">📧</span>
+                            <span>Sản phẩm</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/category" class="flex items-center rounded p-2 text-pink-600 transition-colors hover:bg-pink-100 hover:text-pink-800">
+                            <span class="mr-2 text-2xl">🏢</span>
+                            <span>Loại hàng</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/size" class="flex items-center rounded p-2 text-pink-600 transition-colors hover:bg-pink-100 hover:text-pink-800">
+                            <span class="mr-2 text-2xl">📊</span>
+                            <span>Kích cỡ</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/color" class="flex items-center rounded p-2 text-pink-600 transition-colors hover:bg-pink-100 hover:text-pink-800">
+                            <span class="mr-2 text-2xl">🎨</span>
+                            <span>Màu sắc</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/order" class="flex items-center rounded p-2 text-pink-600 transition-colors hover:bg-pink-100 hover:text-pink-800">
+                            <span class="mr-2 text-2xl">➡️</span>
+                            <span>Đơn hàng</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/chat" class="flex items-center rounded p-2 text-pink-600 transition-colors hover:bg-pink-100 hover:text-pink-800">
+                            <span class="mr-2 text-2xl">💬</span>
+                            <span>Chat</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/statistics" class="flex items-center rounded p-2 text-pink-600 transition-colors hover:bg-pink-100 hover:text-pink-800">
+                            <span class="mr-2 text-2xl">📑</span>
+                            <span>Thống kê</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="flex-1 overflow-y-auto bg-gray-50 p-4">
+                <h2 class="mb-4 text-2xl font-semibold text-pink-700">Trang Quản Lý</h2>
+                <!-- Nội dung chính của trang layout -->
+            </main>
+        </div>
+    </div>
+}
+
+@code {
+    private bool isLoading = true;
+    private string userRole = "";
+    private string userEmail = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAuthState();
+        if (string.IsNullOrEmpty(userRole) || userRole != "Admin")
+        {
+            Navigation.NavigateTo("/access-denied", forceLoad: true);
+        }
+        isLoading = false;
+    }
+
+    private async Task LoadAuthState()
+    {
+        try
+        {
+            var token = await LocalStorage.GetItemAsync<string>("authToken");
+            userEmail = await LocalStorage.GetItemAsync<string>("userEmail");
+            userRole = await LocalStorage.GetItemAsync<string>("userRole");
+            Console.WriteLine($"Layout - Token: {token}, Email: {userEmail}, Role: {userRole}");
+
+            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(userRole))
+            {
+                Navigation.NavigateTo("/login", forceLoad: true);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading auth state: {ex.Message}");
+            Navigation.NavigateTo("/login", forceLoad: true);
+        }
+    }
+
+    private async Task Logout()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("clearAuthData");
+            Navigation.NavigateTo("/login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error during logout: {ex.Message}");
+        }
+    }
+}
