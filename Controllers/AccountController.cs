@@ -123,6 +123,9 @@ namespace ASM_NhomSugar_SD19311.Controllers
             }
         }
 
+
+
+
         [HttpGet("check-role")]
         [Authorize]
         public IActionResult CheckRole()
@@ -168,6 +171,8 @@ namespace ASM_NhomSugar_SD19311.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+
         [HttpGet]
         public async Task<List<Accounts>> GetAllAccountsAsync()
         {
@@ -205,6 +210,8 @@ namespace ASM_NhomSugar_SD19311.Controllers
 
             return Ok(new { message = "Thêm tài khoản thành công!" });
         }
+
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAccount(int id, [FromBody] RegisterRequest request)
         {
@@ -225,6 +232,8 @@ namespace ASM_NhomSugar_SD19311.Controllers
             await _context.SaveChangesAsync();
             return Ok(new { message = "Cập nhật tài khoản thành công!" });
         }
+
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAccount(int id)
         {

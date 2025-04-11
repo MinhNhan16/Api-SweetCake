@@ -1,4 +1,5 @@
 ﻿@page "/statistics"
+@using ASM_NhomSugar_SD19311.Enums
 @using ASM_NhomSugar_SD19311.Service
 @using ASM_NhomSugar_SD19311.Helpers
 @using ChartJs.Blazor
@@ -159,7 +160,7 @@
         {
             // Fetch data
             totalRevenue = await StatisticsService.GetTotalRevenueAsync();
-            // totalCustomers = await StatisticsService.GetTotalCustomersAsync();
+            totalCustomers = await StatisticsService.GetTotalCustomersAsync();
             totalOrders = await StatisticsService.GetTotalOrdersAsync();
             revenueTrend = await StatisticsService.GetRevenueTrendAsync() ?? new Dictionary<string, decimal>();
             orderStatusDistribution = await StatisticsService.GetOrderStatusDistributionAsync() ?? new Dictionary<string, int>();
@@ -186,7 +187,10 @@
                 }
             };
 
-            var statusLabels = orderStatusDistribution.Keys.Select(k => EnumHelper.GetOrderStatusDisplayName(k)).ToList();
+            var statusLabels = orderStatusDistribution.Keys
+     .Select(k => EnumHelper.GetOrderStatusDisplayName(Enum.Parse<OrderStatus>(k)))
+     .ToList();
+
             pieChartConfig.Data.Labels.AddRange(statusLabels);
 
             var pieDataset = new PieDataset

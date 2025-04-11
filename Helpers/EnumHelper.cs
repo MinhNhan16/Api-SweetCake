@@ -1,15 +1,19 @@
-﻿namespace ASM_NhomSugar_SD19311.Helpers
+﻿using ASM_NhomSugar_SD19311.Enums;
+
+namespace ASM_NhomSugar_SD19311.Helpers
 {
     public static class EnumHelper
     {
-        public static string GetOrderStatusDisplayName(string status)
+        public static string GetOrderStatusDisplayName(OrderStatus status)
         {
             return status switch
             {
-                "Placed" => "Đang xử lý", // Map "Placed" to "Đang xử lý" as per the screenshot
-                "Delivered" => "Đã giao",
-                "Cancelled" => "Hủy",
-                _ => status
+                OrderStatus.Placed => "Đang xử lý",
+                OrderStatus.Confirmed => "Đã xác nhận",
+                OrderStatus.Shipping => "Đang giao",
+                OrderStatus.Delivered => "Đã giao",
+                OrderStatus.Cancelled => "Đã hủy",
+                _ => status.ToString()
             };
         }
     }

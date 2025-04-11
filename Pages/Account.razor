@@ -9,65 +9,128 @@
 
 <h3 class="mb-4 text-2xl font-bold">Quản lý tài khoản</h3>
 
-<!-- Form thêm/sửa tài khoản -->
+<!-- Form thêm tài khoản -->
 <div class="mb-6 rounded-lg bg-white p-6 shadow">
-    <h4 class="mb-4 text-lg font-semibold">@((isEditMode ? "Sửa tài khoản" : "Thêm tài khoản"))</h4>
-    <EditForm Model="@currentAccount" OnValidSubmit="HandleValidSubmit">
+    <h4 class="mb-4 text-lg font-semibold">Thêm tài khoản</h4>
+    <EditForm Model="@newAccount" OnValidSubmit="HandleAddSubmit">
         <DataAnnotationsValidator />
         
         <div class="mb-4">
             <label class="mb-1 block font-medium">Tên đăng nhập</label>
-            <InputText class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Username" />
-            <ValidationMessage For="@(() => currentAccount.Username)" class="text-red-500 text-sm" />
+            <InputText class="w-full rounded border px-3 py-2" @bind-Value="newAccount.Username" />
+            <ValidationMessage For="@(() => newAccount.Username)" class="text-red-500 text-sm" />
         </div>
         
         <div class="mb-4">
             <label class="mb-1 block font-medium">Mật khẩu</label>
-            <InputText type="password" class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Password" />
-            <ValidationMessage For="@(() => currentAccount.Password)" class="text-red-500 text-sm" />
+            <InputText type="password" class="w-full rounded border px-3 py-2" @bind-Value="newAccount.Password" />
+            <ValidationMessage For="@(() => newAccount.Password)" class="text-red-500 text-sm" />
         </div>
         
         <div class="mb-4">
             <label class="mb-1 block font-medium">Email</label>
-            <InputText type="email" class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Email" />
-            <ValidationMessage For="@(() => currentAccount.Email)" class="text-red-500 text-sm" />
+            <InputText type="email" class="w-full rounded border px-3 py-2" @bind-Value="newAccount.Email" />
+            <ValidationMessage For="@(() => newAccount.Email)" class="text-red-500 text-sm" />
         </div>
 
         <div class="mb-4">
             <label class="mb-1 block font-medium">Vai trò</label>
-            <InputSelect class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Role">
+            <InputSelect class="w-full rounded border px-3 py-2" @bind-Value="newAccount.Role">
                 <option value="">-- Chọn vai trò --</option>
                 <option value="Admin">Admin</option>
                 <option value="Customer">Customer</option>
                 <option value="Shipper">Shipper</option>
             </InputSelect>
-            <ValidationMessage For="@(() => currentAccount.Role)" class="text-red-500 text-sm" />
+            <ValidationMessage For="@(() => newAccount.Role)" class="text-red-500 text-sm" />
         </div>
 
         <div class="mb-4">
             <label class="mb-1 block font-medium">Họ và tên</label>
-            <InputText class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.FullName" />
-            <ValidationMessage For="@(() => currentAccount.FullName)" class="text-red-500 text-sm" />
+            <InputText class="w-full rounded border px-3 py-2" @bind-Value="newAccount.FullName" />
+            <ValidationMessage For="@(() => newAccount.FullName)" class="text-red-500 text-sm" />
         </div>
 
         <div class="mb-4">
             <label class="mb-1 block font-medium">Số điện thoại</label>
-            <InputText class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Phone" />
-            <ValidationMessage For="@(() => currentAccount.Phone)" class="text-red-500 text-sm" />
+            <InputText class="w-full rounded border px-3 py-2" @bind-Value="newAccount.Phone" />
+            <ValidationMessage For="@(() => newAccount.Phone)" class="text-red-500 text-sm" />
         </div>
 
         <div class="mb-4">
             <label class="mb-1 block font-medium">Địa chỉ</label>
-            <InputText class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Address" />
-            <ValidationMessage For="@(() => currentAccount.Address)" class="text-red-500 text-sm" />
+            <InputText class="w-full rounded border px-3 py-2" @bind-Value="newAccount.Address" />
+            <ValidationMessage For="@(() => newAccount.Address)" class="text-red-500 text-sm" />
         </div>
 
         <div class="flex justify-end space-x-2">
             <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">Lưu</button>
-            <button type="button" class="rounded bg-gray-300 px-4 py-2 text-gray-800 hover:bg-gray-400" @onclick="ResetForm">Hủy</button>
+            <button type="button" class="rounded bg-gray-300 px-4 py-2 text-gray-800 hover:bg-gray-400" @onclick="ResetAddForm">Hủy</button>
         </div>
     </EditForm>
 </div>
+
+<!-- Form sửa tài khoản -->
+@if (isEditMode)
+{
+    <div class="border-2 mb-6 rounded-lg border-yellow-300 bg-white p-6 shadow">
+        <h4 class="mb-4 text-lg font-semibold">Sửa tài khoản</h4>
+        <EditForm Model="@currentAccount" OnValidSubmit="HandleEditSubmit">
+            <DataAnnotationsValidator />
+            
+            <div class="mb-4">
+                <label class="mb-1 block font-medium">Tên đăng nhập</label>
+                <InputText class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Username" />
+                <ValidationMessage For="@(() => currentAccount.Username)" class="text-red-500 text-sm" />
+            </div>
+            
+            <div class="mb-4">
+                <label class="mb-1 block font-medium">Mật khẩu mới (để trống nếu không đổi)</label>
+                <InputText type="password" class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Password" />
+                <ValidationMessage For="@(() => currentAccount.Password)" class="text-red-500 text-sm" />
+            </div>
+            
+            <div class="mb-4">
+                <label class="mb-1 block font-medium">Email</label>
+                <InputText type="email" class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Email" />
+                <ValidationMessage For="@(() => currentAccount.Email)" class="text-red-500 text-sm" />
+            </div>
+
+            <div class="mb-4">
+                <label class="mb-1 block font-medium">Vai trò</label>
+                <InputSelect class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Role">
+                    <option value="">-- Chọn vai trò --</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Customer">Customer</option>
+                    <option value="Shipper">Shipper</option>
+                </InputSelect>
+                <ValidationMessage For="@(() => currentAccount.Role)" class="text-red-500 text-sm" />
+            </div>
+
+            <div class="mb-4">
+                <label class="mb-1 block font-medium">Họ và tên</label>
+                <InputText class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.FullName" />
+                <ValidationMessage For="@(() => currentAccount.FullName)" class="text-red-500 text-sm" />
+            </div>
+
+            <div class="mb-4">
+                <label class="mb-1 block font-medium">Số điện thoại</label>
+                <InputText class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Phone" />
+                <ValidationMessage For="@(() => currentAccount.Phone)" class="text-red-500 text-sm" />
+            </div>
+
+            <div class="mb-4">
+                <label class="mb-1 block font-medium">Địa chỉ</label>
+                <InputText class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Address" />
+                <ValidationMessage For="@(() => currentAccount.Address)" class="text-red-500 text-sm" />
+            </div>
+
+            <div class="flex justify-end space-x-2">
+                <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">Cập nhật</button>
+                <button type="button" class="rounded bg-gray-300 px-4 py-2 text-gray-800 hover:bg-gray-400" @onclick="ResetEditForm">Hủy</button>
+            </div>
+        </EditForm>
+    </div>
+}
 
 @if (accounts == null)
 {
@@ -101,8 +164,9 @@ else
                         <td class="px-4 py-2">@acc.Phone</td>
                         <td class="px-4 py-2">@acc.Address</td>
                         <td class="space-x-2 px-4 py-2">
-                            <button class="rounded bg-yellow-500 px-3 py-1 text-white hover:bg-yellow-600" @onclick="() => ShowEditAccount(acc)">Sửa</button>
-                            <button class="rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700" @onclick="() => DeleteAccount(acc.Id)">Xóa</button>
+
+                            <button class="btn btn-danger btn-sm rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600" @onclick="() => ShowEditAccount(acc)">Sửa</button>
+                            <button class="btn btn-warning btn-sm rounded-md bg-yellow-500 px-4 py-2 text-white hover:bg-yellow-600" @onclick="() => DeleteAccount(acc.Id)">Xóa</button>
                         </td>
                     </tr>
                 }
@@ -113,7 +177,8 @@ else
 
 @code {
     private List<Accounts> accounts;
-    private Accounts currentAccount = new Accounts();
+    private Accounts newAccount = new Accounts(); // For adding new accounts
+    private Accounts currentAccount = new Accounts(); // For editing existing accounts
     private bool isEditMode = false;
 
     protected override async Task OnInitializedAsync()
@@ -147,7 +212,7 @@ else
         {
             Id = acc.Id,
             Username = acc.Username,
-            Password = string.Empty,
+            Password = string.Empty, // Clear password for edit mode
             Role = acc.Role,
             Email = acc.Email,
             FullName = acc.FullName,
@@ -155,44 +220,68 @@ else
             Address = acc.Address
         };
         isEditMode = true;
-
     }
 
-    private void ResetForm()
+    private void ResetAddForm()
+    {
+        newAccount = new Accounts();
+    }
+
+    private void ResetEditForm()
     {
         currentAccount = new Accounts();
         isEditMode = false;
     }
 
-    private async Task HandleValidSubmit()
+    private async Task HandleAddSubmit()
     {
         try
         {
-            HttpResponseMessage response;
-            if (isEditMode)
-            {
-                response = await Http.PutAsJsonAsync($"https://localhost:44366/api/account/{currentAccount.Id}", currentAccount);
-            }
-            else
-            {
-                response = await Http.PostAsJsonAsync("https://localhost:44366/api/account/create", currentAccount);
-            }
+            Console.WriteLine("Adding: " + System.Text.Json.JsonSerializer.Serialize(newAccount));
+            var response = await Http.PostAsJsonAsync("https://localhost:44366/api/account/create", newAccount);
 
             if (response.IsSuccessStatusCode)
             {
                 await LoadAccounts();
-                ResetForm();
-                await JSRuntime.InvokeVoidAsync("alert", isEditMode ? "Cập nhật tài khoản thành công!" : "Thêm tài khoản thành công!");
+                ResetAddForm();
+                await JSRuntime.InvokeVoidAsync("alert", "Thêm tài khoản thành công!");
             }
             else
             {
                 var error = await response.Content.ReadAsStringAsync();
-                await JSRuntime.InvokeVoidAsync("alert", $"Thao tác thất bại. Lỗi: {error}");
+                await JSRuntime.InvokeVoidAsync("alert", $"Thêm thất bại. Mã lỗi: {response.StatusCode}. Chi tiết: {error}");
             }
         }
         catch (Exception ex)
         {
-            await JSRuntime.InvokeVoidAsync("alert", $"Lỗi: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", $"Lỗi hệ thống: {ex.Message}");
+            Console.WriteLine($"Error: {ex}");
+        }
+    }
+
+    private async Task HandleEditSubmit()
+    {
+        try
+        {
+            Console.WriteLine("Updating: " + System.Text.Json.JsonSerializer.Serialize(currentAccount));
+            var response = await Http.PutAsJsonAsync($"https://localhost:44366/api/account/{currentAccount.Id}", currentAccount);
+
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadAccounts();
+                ResetEditForm();
+                await JSRuntime.InvokeVoidAsync("alert", "Cập nhật tài khoản thành công!");
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                await JSRuntime.InvokeVoidAsync("alert", $"Cập nhật thất bại. Mã lỗi: {response.StatusCode}. Chi tiết: {error}");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Lỗi hệ thống: {ex.Message}");
+            Console.WriteLine($"Error: {ex}");
         }
     }
 
