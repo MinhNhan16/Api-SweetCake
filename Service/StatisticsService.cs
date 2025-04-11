@@ -6,9 +6,9 @@ namespace ASM_NhomSugar_SD19311.Service // Fixed namespace to match previous con
 {
     public class StatisticsService
     {
-        private readonly CakeShopContext _context;
+        private readonly CakeShopDbContext _context;
 
-        public StatisticsService(CakeShopContext context)
+        public StatisticsService(CakeShopDbContext context)
         {
             _context = context;
         }
@@ -18,10 +18,10 @@ namespace ASM_NhomSugar_SD19311.Service // Fixed namespace to match previous con
             return await _context.Orders.SumAsync(o => o.TotalPrice);
         }
 
-        public async Task<int> GetTotalCustomersAsync()
-        {
-            return await _context.Users.CountAsync();
-        }
+        //public async Task<int> GetTotalCustomersAsync()
+        //{
+        //    return await _context.Users.CountAsync();
+        //}
 
         public async Task<int> GetTotalOrdersAsync()
         {

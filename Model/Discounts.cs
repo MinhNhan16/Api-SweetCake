@@ -6,7 +6,6 @@ namespace ASM_NhomSugar_SD19311.Model
     public class Discounts
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Required]
@@ -14,6 +13,7 @@ namespace ASM_NhomSugar_SD19311.Model
         public string Code { get; set; }
 
         [Required]
+        [Column(TypeName = "decimal(5,2)")]
         public decimal DiscountValue { get; set; }
 
         [Required]
@@ -21,5 +21,7 @@ namespace ASM_NhomSugar_SD19311.Model
 
         [Required]
         public DateTime EndDate { get; set; }
+
+        public virtual ICollection<Orders> Orders { get; set; }
     }
 }

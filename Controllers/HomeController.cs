@@ -9,9 +9,9 @@ namespace ASM_NhomSugar_SD19311.Controllers
     [ApiController]
     public class HomeController : Controller
     {
-        private readonly CakeShopContext _context;
+        private readonly CakeShopDbContext _context;
 
-        public HomeController(CakeShopContext context)
+        public HomeController(CakeShopDbContext context)
         {
             _context = context;
         }

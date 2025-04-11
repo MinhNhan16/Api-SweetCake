@@ -6,7 +6,6 @@ namespace ASM_NhomSugar_SD19311.Model
     public class Chats
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Required]
@@ -23,12 +22,12 @@ namespace ASM_NhomSugar_SD19311.Model
         public DateTime SentDate { get; set; }
 
         [Required]
-        public bool IsRead { get; set; }
+        public bool IsRead { get; set; } = false;
 
         [ForeignKey("SenderId")]
-        public Accounts Sender { get; set; }
+        public virtual Accounts Sender { get; set; }
 
         [ForeignKey("ReceiverId")]
-        public Accounts Receiver { get; set; }
+        public virtual Accounts Receiver { get; set; }
     }
 }

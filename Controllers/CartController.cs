@@ -9,9 +9,9 @@ namespace ASM_NhomSugar_SD19311.Controllers
     [Route("api/[controller]")]
     public class CartController : ControllerBase
     {
-        private readonly CakeShopContext _context;
+        private readonly CakeShopDbContext _context;
 
-        public CartController(CakeShopContext context)
+        public CartController(CakeShopDbContext context)
         {
             _context = context;
         }

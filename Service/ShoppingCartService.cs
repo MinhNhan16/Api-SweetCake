@@ -6,9 +6,9 @@ namespace ASM_NhomSugar_SD19311.Service
 {
     public class ShoppingCartService
     {
-        private readonly CakeShopContext _context;
+        private readonly CakeShopDbContext _context;
 
-        public ShoppingCartService(CakeShopContext context)
+        public ShoppingCartService(CakeShopDbContext context)
         {
             _context = context;
         }

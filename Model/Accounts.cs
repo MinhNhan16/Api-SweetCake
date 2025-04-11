@@ -1,28 +1,48 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASM_NhomSugar_SD19311.Model
 {
     public class Accounts
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Username là bắt buộc")]
-        [StringLength(50, ErrorMessage = "Username không được dài quá 50 ký tự")]
+        [Required]
+        [StringLength(50)]
         public string Username { get; set; }
 
-        [Required(ErrorMessage = "Mật khẩu là bắt buộc")]
-        [StringLength(100, ErrorMessage = "Mật khẩu không được dài quá 100 ký tự")]
+        [Required]
+        [StringLength(100)]
         public string Password { get; set; }
 
-        [Required(ErrorMessage = "Email là bắt buộc")]
-        [EmailAddress(ErrorMessage = "Định dạng email không hợp lệ")]
-        public string Email { get; set; }
-
-        [StringLength(20, ErrorMessage = "Vai trò không được dài quá 20 ký tự")]
+        [Required]
+        [StringLength(20)]
+        [RegularExpression("^(Admin|Customer|Shipper)$")]
         public string Role { get; set; }
 
+        [Required]
+        [StringLength(100)]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required]
+        [StringLength(100)]
+        public string FullName { get; set; }
+
+        [Required]
+        [StringLength(20)]
+        [Phone]
+        public string Phone { get; set; }
+
+        [Required]
+        [StringLength(200)]
+        public string Address { get; set; }
+
+        // Navigation properties
+        public virtual ICollection<Cart> Carts { get; set; }
+        public virtual ICollection<Orders> CustomerOrders { get; set; }
+        public virtual ICollection<Orders> ShipperOrders { get; set; }
+        public virtual ICollection<Chats> SentChats { get; set; }
+        public virtual ICollection<Chats> ReceivedChats { get; set; }
     }
 }

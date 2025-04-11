@@ -1,6 +1,5 @@
 ﻿using ApexCharts;
 using ASM_NhomSugar_SD19311.Data;
-using ASM_NhomSugar_SD19311.Interface;
 using ASM_NhomSugar_SD19311.Service;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -23,8 +22,18 @@ builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddApexCharts();
 builder.Services.AddScoped<StatisticsService>();
+builder.Services.AddScoped<AccountService>();
+builder.Services.AddHttpClient<AccountService>(client =>
+{
+    client.BaseAddress = new Uri("http://localhost:44366/"); // Thay bằng URL API của bạn
+});
+builder.Services.AddLogging(logging =>
+{
+    logging.AddConsole();
+    logging.SetMinimumLevel(LogLevel.Information);
+});
 // Thêm dịch vụ DbContext
-builder.Services.AddDbContext<CakeShopContext>(options =>
+builder.Services.AddDbContext<CakeShopDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Thêm CORS
@@ -44,7 +53,7 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 builder.Services.AddScoped<ShoppingCartService>();
-builder.Services.AddScoped<IUserService, UserService>();
+//builder.Services.AddScoped<IUserService, UserService>();
 
 // Thêm dịch vụ Swagger
 builder.Services.AddSwaggerGen(c =>

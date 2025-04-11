@@ -7,9 +7,9 @@ namespace ASM_NhomSugar_SD19311.Controllers
     [ApiController]
     public class StatisticsController : ControllerBase
     {
-        private readonly CakeShopContext _context;
+        private readonly CakeShopDbContext _context;
 
-        public StatisticsController(CakeShopContext context)
+        public StatisticsController(CakeShopDbContext context)
         {
             _context = context;
         }

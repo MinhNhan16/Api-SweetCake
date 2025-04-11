@@ -159,7 +159,7 @@
         {
             // Fetch data
             totalRevenue = await StatisticsService.GetTotalRevenueAsync();
-            totalCustomers = await StatisticsService.GetTotalCustomersAsync();
+            // totalCustomers = await StatisticsService.GetTotalCustomersAsync();
             totalOrders = await StatisticsService.GetTotalOrdersAsync();
             revenueTrend = await StatisticsService.GetRevenueTrendAsync() ?? new Dictionary<string, decimal>();
             orderStatusDistribution = await StatisticsService.GetOrderStatusDistributionAsync() ?? new Dictionary<string, int>();

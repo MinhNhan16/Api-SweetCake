@@ -1,5 +1,4 @@
-﻿using ASM_NhomSugar_SD19311.Enums;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASM_NhomSugar_SD19311.Model
@@ -7,17 +6,17 @@ namespace ASM_NhomSugar_SD19311.Model
     public class Orders
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Required]
         public DateTime OrderDate { get; set; }
 
         [Required]
+        [Column(TypeName = "decimal(18,0)")]
         public decimal TotalPrice { get; set; }
 
         [Required]
-        public OrderStatus OrderStatus { get; set; }
+        public int OrderStatus { get; set; }
 
         [Required]
         public int CustomerId { get; set; }
@@ -27,13 +26,14 @@ namespace ASM_NhomSugar_SD19311.Model
         public int? DiscountId { get; set; }
 
         [ForeignKey("CustomerId")]
-        public Accounts Customer { get; set; }
+        public virtual Accounts Customer { get; set; }
 
         [ForeignKey("ShipperId")]
-        public Accounts Shipper { get; set; }
+        public virtual Accounts Shipper { get; set; }
 
         [ForeignKey("DiscountId")]
-        public Discounts Discount { get; set; }
-        public List<OrderDetails> OrderDetails { get; set; } // Add this property
+        public virtual Discounts Discount { get; set; }
+
+        public virtual ICollection<OrderDetails> OrderDetails { get; set; }
     }
 }

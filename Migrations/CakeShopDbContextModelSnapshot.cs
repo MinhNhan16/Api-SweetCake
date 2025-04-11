@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ASM_NhomSugar_SD19311.Migrations
 {
-    [DbContext(typeof(CakeShopContext))]
-    partial class CakeShopContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(CakeShopDbContext))]
+    partial class CakeShopDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -30,7 +30,17 @@ namespace ASM_NhomSugar_SD19311.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -40,12 +50,15 @@ namespace ASM_NhomSugar_SD19311.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<string>("Role")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasDefaultValue("Customer");
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -95,7 +108,7 @@ namespace ASM_NhomSugar_SD19311.Migrations
                         .HasColumnOrder(1);
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,0)");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -173,7 +186,7 @@ namespace ASM_NhomSugar_SD19311.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<decimal>("DiscountValue")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(5,2)");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
@@ -200,7 +213,7 @@ namespace ASM_NhomSugar_SD19311.Migrations
                         .HasColumnOrder(1);
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,0)");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -236,7 +249,7 @@ namespace ASM_NhomSugar_SD19311.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,0)");
 
                     b.HasKey("Id");
 
@@ -276,7 +289,7 @@ namespace ASM_NhomSugar_SD19311.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,0)");
 
                     b.Property<int>("Stock")
                         .HasColumnType("int");
@@ -288,44 +301,10 @@ namespace ASM_NhomSugar_SD19311.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("ASM_NhomSugar_SD19311.Model.Users", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AccountId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AccountId")
-                        .IsUnique();
-
-                    b.ToTable("Users");
-                });
-
             modelBuilder.Entity("ASM_NhomSugar_SD19311.Model.Cart", b =>
                 {
                     b.HasOne("ASM_NhomSugar_SD19311.Model.Accounts", "Customer")
-                        .WithMany()
+                        .WithMany("Carts")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -336,13 +315,13 @@ namespace ASM_NhomSugar_SD19311.Migrations
             modelBuilder.Entity("ASM_NhomSugar_SD19311.Model.CartDetails", b =>
                 {
                     b.HasOne("ASM_NhomSugar_SD19311.Model.Cart", "Cart")
-                        .WithMany()
+                        .WithMany("CartDetails")
                         .HasForeignKey("CartId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ASM_NhomSugar_SD19311.Model.Products", "Product")
-                        .WithMany()
+                        .WithMany("CartDetails")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -355,15 +334,15 @@ namespace ASM_NhomSugar_SD19311.Migrations
             modelBuilder.Entity("ASM_NhomSugar_SD19311.Model.Chats", b =>
                 {
                     b.HasOne("ASM_NhomSugar_SD19311.Model.Accounts", "Receiver")
-                        .WithMany()
+                        .WithMany("ReceivedChats")
                         .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("ASM_NhomSugar_SD19311.Model.Accounts", "Sender")
-                        .WithMany()
+                        .WithMany("SentChats")
                         .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Receiver");
@@ -374,13 +353,13 @@ namespace ASM_NhomSugar_SD19311.Migrations
             modelBuilder.Entity("ASM_NhomSugar_SD19311.Model.OrderDetails", b =>
                 {
                     b.HasOne("ASM_NhomSugar_SD19311.Model.Orders", "Order")
-                        .WithMany()
+                        .WithMany("OrderDetails")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ASM_NhomSugar_SD19311.Model.Products", "Product")
-                        .WithMany()
+                        .WithMany("OrderDetails")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -393,18 +372,19 @@ namespace ASM_NhomSugar_SD19311.Migrations
             modelBuilder.Entity("ASM_NhomSugar_SD19311.Model.Orders", b =>
                 {
                     b.HasOne("ASM_NhomSugar_SD19311.Model.Accounts", "Customer")
-                        .WithMany()
+                        .WithMany("CustomerOrders")
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("ASM_NhomSugar_SD19311.Model.Discounts", "Discount")
-                        .WithMany()
+                        .WithMany("Orders")
                         .HasForeignKey("DiscountId");
 
                     b.HasOne("ASM_NhomSugar_SD19311.Model.Accounts", "Shipper")
-                        .WithMany()
-                        .HasForeignKey("ShipperId");
+                        .WithMany("ShipperOrders")
+                        .HasForeignKey("ShipperId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Customer");
 
@@ -416,7 +396,7 @@ namespace ASM_NhomSugar_SD19311.Migrations
             modelBuilder.Entity("ASM_NhomSugar_SD19311.Model.Products", b =>
                 {
                     b.HasOne("ASM_NhomSugar_SD19311.Model.Categories", "Category")
-                        .WithMany()
+                        .WithMany("Products")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -424,15 +404,44 @@ namespace ASM_NhomSugar_SD19311.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("ASM_NhomSugar_SD19311.Model.Users", b =>
+            modelBuilder.Entity("ASM_NhomSugar_SD19311.Model.Accounts", b =>
                 {
-                    b.HasOne("ASM_NhomSugar_SD19311.Model.Accounts", "Account")
-                        .WithMany()
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Carts");
 
-                    b.Navigation("Account");
+                    b.Navigation("CustomerOrders");
+
+                    b.Navigation("ReceivedChats");
+
+                    b.Navigation("SentChats");
+
+                    b.Navigation("ShipperOrders");
+                });
+
+            modelBuilder.Entity("ASM_NhomSugar_SD19311.Model.Cart", b =>
+                {
+                    b.Navigation("CartDetails");
+                });
+
+            modelBuilder.Entity("ASM_NhomSugar_SD19311.Model.Categories", b =>
+                {
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("ASM_NhomSugar_SD19311.Model.Discounts", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("ASM_NhomSugar_SD19311.Model.Orders", b =>
+                {
+                    b.Navigation("OrderDetails");
+                });
+
+            modelBuilder.Entity("ASM_NhomSugar_SD19311.Model.Products", b =>
+                {
+                    b.Navigation("CartDetails");
+
+                    b.Navigation("OrderDetails");
                 });
 #pragma warning restore 612, 618
         }

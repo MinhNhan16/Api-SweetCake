@@ -1,0 +1,222 @@
+﻿@* Pages/AccountManagement.razor *@
+@page "/account"
+@using ASM_NhomSugar_SD19311.Model
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.JSInterop
+
+<h3 class="mb-4 text-2xl font-bold">Quản lý tài khoản</h3>
+
+<!-- Form thêm/sửa tài khoản -->
+<div class="mb-6 rounded-lg bg-white p-6 shadow">
+    <h4 class="mb-4 text-lg font-semibold">@((isEditMode ? "Sửa tài khoản" : "Thêm tài khoản"))</h4>
+    <EditForm Model="@currentAccount" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        
+        <div class="mb-4">
+            <label class="mb-1 block font-medium">Tên đăng nhập</label>
+            <InputText class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Username" />
+            <ValidationMessage For="@(() => currentAccount.Username)" class="text-red-500 text-sm" />
+        </div>
+        
+        <div class="mb-4">
+            <label class="mb-1 block font-medium">Mật khẩu</label>
+            <InputText type="password" class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Password" />
+            <ValidationMessage For="@(() => currentAccount.Password)" class="text-red-500 text-sm" />
+        </div>
+        
+        <div class="mb-4">
+            <label class="mb-1 block font-medium">Email</label>
+            <InputText type="email" class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Email" />
+            <ValidationMessage For="@(() => currentAccount.Email)" class="text-red-500 text-sm" />
+        </div>
+
+        <div class="mb-4">
+            <label class="mb-1 block font-medium">Vai trò</label>
+            <InputSelect class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Role">
+                <option value="">-- Chọn vai trò --</option>
+                <option value="Admin">Admin</option>
+                <option value="Customer">Customer</option>
+                <option value="Shipper">Shipper</option>
+            </InputSelect>
+            <ValidationMessage For="@(() => currentAccount.Role)" class="text-red-500 text-sm" />
+        </div>
+
+        <div class="mb-4">
+            <label class="mb-1 block font-medium">Họ và tên</label>
+            <InputText class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.FullName" />
+            <ValidationMessage For="@(() => currentAccount.FullName)" class="text-red-500 text-sm" />
+        </div>
+
+        <div class="mb-4">
+            <label class="mb-1 block font-medium">Số điện thoại</label>
+            <InputText class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Phone" />
+            <ValidationMessage For="@(() => currentAccount.Phone)" class="text-red-500 text-sm" />
+        </div>
+
+        <div class="mb-4">
+            <label class="mb-1 block font-medium">Địa chỉ</label>
+            <InputText class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Address" />
+            <ValidationMessage For="@(() => currentAccount.Address)" class="text-red-500 text-sm" />
+        </div>
+
+        <div class="flex justify-end space-x-2">
+            <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">Lưu</button>
+            <button type="button" class="rounded bg-gray-300 px-4 py-2 text-gray-800 hover:bg-gray-400" @onclick="ResetForm">Hủy</button>
+        </div>
+    </EditForm>
+</div>
+
+@if (accounts == null)
+{
+    <p class="text-gray-500 italic">Đang tải...</p>
+}
+else
+{
+    <div class="overflow-x-auto">
+        <table class="min-w-full rounded-lg border bg-white shadow">
+            <thead class="bg-gray-100 text-gray-700">
+                <tr>
+                    <th class="px-4 py-2 text-left">ID</th>
+                    <th class="px-4 py-2 text-left">Tên đăng nhập</th>
+                    <th class="px-4 py-2 text-left">Email</th>
+                    <th class="px-4 py-2 text-left">Vai trò</th>
+                    <th class="px-4 py-2 text-left">Họ và tên</th>
+                    <th class="px-4 py-2 text-left">SĐT</th>
+                    <th class="px-4 py-2 text-left">Địa chỉ</th>
+                    <th class="px-4 py-2 text-left">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var acc in accounts)
+                {
+                    <tr class="border-t hover:bg-gray-50">
+                        <td class="px-4 py-2">@acc.Id</td>
+                        <td class="px-4 py-2">@acc.Username</td>
+                        <td class="px-4 py-2">@acc.Email</td>
+                        <td class="px-4 py-2">@acc.Role</td>
+                        <td class="px-4 py-2">@acc.FullName</td>
+                        <td class="px-4 py-2">@acc.Phone</td>
+                        <td class="px-4 py-2">@acc.Address</td>
+                        <td class="space-x-2 px-4 py-2">
+                            <button class="rounded bg-yellow-500 px-3 py-1 text-white hover:bg-yellow-600" @onclick="() => ShowEditAccount(acc)">Sửa</button>
+                            <button class="rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700" @onclick="() => DeleteAccount(acc.Id)">Xóa</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<Accounts> accounts;
+    private Accounts currentAccount = new Accounts();
+    private bool isEditMode = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAccounts();
+    }
+
+    private async Task LoadAccounts()
+    {
+        try
+        {
+            var response = await Http.GetAsync("https://localhost:44366/api/account");
+            if (response.IsSuccessStatusCode)
+            {
+                accounts = await response.Content.ReadFromJsonAsync<List<Accounts>>();
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Không thể tải danh sách tài khoản.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Lỗi khi tải tài khoản: {ex.Message}");
+        }
+    }
+
+    private void ShowEditAccount(Accounts acc)
+    {
+        currentAccount = new Accounts
+        {
+            Id = acc.Id,
+            Username = acc.Username,
+            Password = string.Empty,
+            Role = acc.Role,
+            Email = acc.Email,
+            FullName = acc.FullName,
+            Phone = acc.Phone,
+            Address = acc.Address
+        };
+        isEditMode = true;
+
+    }
+
+    private void ResetForm()
+    {
+        currentAccount = new Accounts();
+        isEditMode = false;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            HttpResponseMessage response;
+            if (isEditMode)
+            {
+                response = await Http.PutAsJsonAsync($"https://localhost:44366/api/account/{currentAccount.Id}", currentAccount);
+            }
+            else
+            {
+                response = await Http.PostAsJsonAsync("https://localhost:44366/api/account/create", currentAccount);
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadAccounts();
+                ResetForm();
+                await JSRuntime.InvokeVoidAsync("alert", isEditMode ? "Cập nhật tài khoản thành công!" : "Thêm tài khoản thành công!");
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                await JSRuntime.InvokeVoidAsync("alert", $"Thao tác thất bại. Lỗi: {error}");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Lỗi: {ex.Message}");
+        }
+    }
+
+    private async Task DeleteAccount(int id)
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Bạn có chắc chắn muốn xóa tài khoản này?");
+        if (!confirmed) return;
+
+        try
+        {
+            var response = await Http.DeleteAsync($"https://localhost:44366/api/account/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadAccounts();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                await JSRuntime.InvokeVoidAsync("alert", $"Xóa thất bại. Lỗi: {error}");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Lỗi: {ex.Message}");
+        }
+    }
+}

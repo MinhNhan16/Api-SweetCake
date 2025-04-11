@@ -17,11 +17,11 @@ namespace ASM_NhomSugar_SD19311.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly CakeShopContext _context;
+        private readonly CakeShopDbContext _context;
         private readonly IConfiguration _configuration;
         private readonly AuthService _authService;
 
-        public AccountController(CakeShopContext context, IConfiguration configuration, AuthService authService)
+        public AccountController(CakeShopDbContext context, IConfiguration configuration, AuthService authService)
         {
             _context = context;
             _configuration = configuration;
@@ -66,7 +66,7 @@ namespace ASM_NhomSugar_SD19311.Controllers
 
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
                 await _context.Database.ExecuteSqlRawAsync(
-                    "EXEC AddAccountAndUser @Username, @Password, @Role, @Email, @FullName, @Phone, @Address",
+                    "EXEC AddAccount @Username, @Password, @Role, @Email, @FullName, @Phone, @Address",
                     new SqlParameter("@Username", request.Username),
                     new SqlParameter("@Password", hashedPassword),
                     new SqlParameter("@Role", role), // Sử dụng role đã xác định
@@ -83,6 +83,7 @@ namespace ASM_NhomSugar_SD19311.Controllers
                 return BadRequest($"Lỗi khi đăng ký: {ex.Message}");
             }
         }
+
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest login)
@@ -167,5 +168,74 @@ namespace ASM_NhomSugar_SD19311.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+        [HttpGet]
+        public async Task<List<Accounts>> GetAllAccountsAsync()
+        {
+            // Truy vấn trực tiếp từ cơ sở dữ liệu hoặc API
+            var accounts = await _context.Accounts.ToListAsync(); // Sử dụng Entity Framework hoặc cách lấy dữ liệu tương ứng
+
+            return accounts; // Trả về danh sách Account
+        }
+
+
+
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateAccount([FromBody] RegisterRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (await _context.Accounts.AnyAsync(a => a.Username == request.Username || a.Email == request.Email))
+                return BadRequest("Username hoặc Email đã tồn tại.");
+
+            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
+            var account = new Accounts
+            {
+                Username = request.Username,
+                Password = hashedPassword,
+                Email = request.Email,
+                FullName = request.FullName,
+                Phone = request.Phone,
+                Address = request.Address,
+                Role = request.Role ?? "Customer"
+            };
+
+            _context.Accounts.Add(account);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Thêm tài khoản thành công!" });
+        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateAccount(int id, [FromBody] RegisterRequest request)
+        {
+            var account = await _context.Accounts.FindAsync(id);
+            if (account == null) return NotFound("Không tìm thấy tài khoản.");
+
+            account.FullName = request.FullName;
+            account.Phone = request.Phone;
+            account.Address = request.Address;
+            account.Role = request.Role;
+
+            // Nếu có mật khẩu mới
+            if (!string.IsNullOrEmpty(request.Password))
+            {
+                account.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Cập nhật tài khoản thành công!" });
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAccount(int id)
+        {
+            var account = await _context.Accounts.FindAsync(id);
+            if (account == null) return NotFound("Không tìm thấy tài khoản.");
+
+            _context.Accounts.Remove(account);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Xoá tài khoản thành công!" });
+        }
+
     }
 }

@@ -6,7 +6,6 @@ namespace ASM_NhomSugar_SD19311.Model
     public class Products
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Required]
@@ -17,6 +16,7 @@ namespace ASM_NhomSugar_SD19311.Model
         public string Description { get; set; }
 
         [Required]
+        [Column(TypeName = "decimal(18,0)")]
         public decimal Price { get; set; }
 
         [Required]
@@ -29,6 +29,9 @@ namespace ASM_NhomSugar_SD19311.Model
         public string ImagePath { get; set; }
 
         [ForeignKey("CategoryId")]
-        public Categories Category { get; set; }
+        public virtual Categories Category { get; set; }
+
+        public virtual ICollection<CartDetails> CartDetails { get; set; }
+        public virtual ICollection<OrderDetails> OrderDetails { get; set; }
     }
 }
