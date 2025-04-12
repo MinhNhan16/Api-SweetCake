@@ -2,11 +2,12 @@
 using ASM_NhomSugar_SD19311.DTO;
 using ASM_NhomSugar_SD19311.Model;
 using ASM_NhomSugar_SD19311.Service;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -26,6 +27,63 @@ namespace ASM_NhomSugar_SD19311.Controllers
             _context = context;
             _configuration = configuration;
             _authService = authService;
+        }
+
+
+        [HttpPost("google-login")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest googleLoginRequest)
+        {
+            var httpClient = new HttpClient();
+            var result = await httpClient.GetAsync($"https://oauth2.googleapis.com/tokeninfo?id_token={googleLoginRequest.Token}");
+            var content = await result.Content.ReadAsStringAsync();
+
+            GoogleTokenInfo googleTokenInfo = JsonConvert.DeserializeObject<GoogleTokenInfo>(content);
+
+            if (googleTokenInfo != null)
+            {
+                Accounts existingAccount = await _context.Accounts.Where(x => x.Email == googleTokenInfo.Email).FirstOrDefaultAsync();
+
+                // chưa tồn tại thì tạo mới
+                if (existingAccount == null)
+                {
+                    await _context.Database.ExecuteSqlRawAsync(
+                      "EXEC AddAccount @Username, @Password, @Role, @Email, @FullName, @Phone, @Address",
+                      new SqlParameter("@Username", googleTokenInfo.Email),
+                      new SqlParameter("@Password", ""),
+                      new SqlParameter("@Role", "Customer"),
+                      new SqlParameter("@Email", googleTokenInfo.Email),
+                      new SqlParameter("@FullName", googleTokenInfo.Name),
+                      new SqlParameter("@Phone", "0000000000"),
+                      new SqlParameter("@Address", "0000000000")
+                  );
+
+                    await _context.SaveChangesAsync();
+
+                    existingAccount = await _context.Accounts.Where(x => x.Email == googleTokenInfo.Email).FirstOrDefaultAsync();
+                }
+
+
+                if (existingAccount == null)
+                {
+                    return BadRequest("Lỗi đăng nhập");
+                }
+
+                var token = GenerateJwtToken(existingAccount);
+                return Ok(new
+                {
+                    message = "Đăng nhập thành công!",
+                    token = token,
+                    user = new
+                    {
+                        existingAccount.Id,
+                        existingAccount.Username,
+                        existingAccount.Email,
+                        existingAccount.Role
+                    }
+                });
+
+            }
+            return BadRequest("Lỗi đăng nhập");
         }
 
 
@@ -127,7 +185,6 @@ namespace ASM_NhomSugar_SD19311.Controllers
 
 
         [HttpGet("check-role")]
-        [Authorize]
         public IActionResult CheckRole()
         {
             var role = User.FindFirst(ClaimTypes.Role)?.Value;
@@ -142,6 +199,7 @@ namespace ASM_NhomSugar_SD19311.Controllers
             {
                 return Ok(new { allowed = true, redirect = "/layout" });
             }
+            return Ok(new { allowed = true, redirect = "/layout" });
 
             // Từ chối các role khác (Shipper, Customer)
             return StatusCode(403, new { allowed = false, redirect = "/access-denied", message = "Bạn không có quyền truy cập trang này." });
