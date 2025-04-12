@@ -23,10 +23,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddApexCharts();
 builder.Services.AddScoped<StatisticsService>();
 builder.Services.AddScoped<AccountService>();
-builder.Services.AddHttpClient<AccountService>(client =>
-{
-    client.BaseAddress = new Uri("http://localhost:44366/"); // Thay bằng URL API của bạn
-});
+builder.Services.AddHttpClient();
 builder.Services.AddLogging(logging =>
 {
     logging.AddConsole();
@@ -68,6 +65,8 @@ builder.Services.AddSwaggerGen(c =>
 
 // Thêm dịch vụ Authentication với JWT
 var key = Encoding.UTF8.GetBytes("ThisIsAReallyStrongSecretKeyForJWT123!nhanptmps40527@gmail.com");
+
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

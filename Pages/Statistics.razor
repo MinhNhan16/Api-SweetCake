@@ -170,11 +170,13 @@
             // Configure Line Chart
             lineChartConfig.Data.Labels.AddRange(revenueTrend.Keys);
             var dataset = new LineDataset<object>
-            {
-                Label = "Thu nhập trung bình",
-                BorderColor = "rgba(75, 192, 192, 1)",
-                Fill = false
-            };
+                {
+                    Label = "Thu nhập trung bình",
+                    BorderColor = "rgba(75, 192, 192, 1)",
+                    BackgroundColor = "rgba(75, 192, 192, 0.2)", // Light fill color
+                    Fill = true, // Enable fill
+                    PointBackgroundColor = "rgba(75, 192, 192, 1)" // Color for data points
+                };
             dataset.AddRange(revenueTrend.Values.Select(v => (object)(double)v));
             lineChartConfig.Data.Datasets.Add(dataset);
 
