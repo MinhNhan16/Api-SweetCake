@@ -1,7 +1,6 @@
 ﻿using ApexCharts;
 using ASM_NhomSugar_SD19311.Data;
 using ASM_NhomSugar_SD19311.Service;
-using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -10,13 +9,9 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Thêm dịch vụ cho Blazor Server
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
 builder.Services.AddHttpClient();
 
 builder.Services.AddScoped<HttpClient>();
-builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
@@ -113,8 +108,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();
 app.MapControllers();
-app.MapBlazorHub(); // Cần cho Blazor Server
-app.MapFallbackToPage("/_Host"); // Định tuyến đến _Host.cshtml
 
 
 app.Run();

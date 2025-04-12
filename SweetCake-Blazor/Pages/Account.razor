@@ -14,19 +14,19 @@
     <h4 class="mb-4 text-lg font-semibold">Thêm tài khoản</h4>
     <EditForm Model="@newAccount" OnValidSubmit="HandleAddSubmit">
         <DataAnnotationsValidator />
-        
+
         <div class="mb-4">
             <label class="mb-1 block font-medium">Tên đăng nhập</label>
             <InputText class="w-full rounded border px-3 py-2" @bind-Value="newAccount.Username" />
             <ValidationMessage For="@(() => newAccount.Username)" class="text-red-500 text-sm" />
         </div>
-        
+
         <div class="mb-4">
             <label class="mb-1 block font-medium">Mật khẩu</label>
             <InputText type="password" class="w-full rounded border px-3 py-2" @bind-Value="newAccount.Password" />
             <ValidationMessage For="@(() => newAccount.Password)" class="text-red-500 text-sm" />
         </div>
-        
+
         <div class="mb-4">
             <label class="mb-1 block font-medium">Email</label>
             <InputText type="email" class="w-full rounded border px-3 py-2" @bind-Value="newAccount.Email" />
@@ -76,19 +76,19 @@
         <h4 class="mb-4 text-lg font-semibold">Sửa tài khoản</h4>
         <EditForm Model="@currentAccount" OnValidSubmit="HandleEditSubmit">
             <DataAnnotationsValidator />
-            
+
             <div class="mb-4">
                 <label class="mb-1 block font-medium">Tên đăng nhập</label>
                 <InputText class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Username" />
                 <ValidationMessage For="@(() => currentAccount.Username)" class="text-red-500 text-sm" />
             </div>
-            
+
             <div class="mb-4">
                 <label class="mb-1 block font-medium">Mật khẩu mới (để trống nếu không đổi)</label>
                 <InputText type="password" class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Password" />
                 <ValidationMessage For="@(() => currentAccount.Password)" class="text-red-500 text-sm" />
             </div>
-            
+
             <div class="mb-4">
                 <label class="mb-1 block font-medium">Email</label>
                 <InputText type="email" class="w-full rounded border px-3 py-2" @bind-Value="currentAccount.Email" />
@@ -209,16 +209,16 @@ else
     private void ShowEditAccount(Accounts acc)
     {
         currentAccount = new Accounts
-        {
-            Id = acc.Id,
-            Username = acc.Username,
-            Password = string.Empty, // Clear password for edit mode
-            Role = acc.Role,
-            Email = acc.Email,
-            FullName = acc.FullName,
-            Phone = acc.Phone,
-            Address = acc.Address
-        };
+            {
+                Id = acc.Id,
+                Username = acc.Username,
+                Password = string.Empty, // Clear password for edit mode
+                Role = acc.Role,
+                Email = acc.Email,
+                FullName = acc.FullName,
+                Phone = acc.Phone,
+                Address = acc.Address
+            };
         isEditMode = true;
     }
 
