@@ -13,5 +13,7 @@ namespace ASM_NhomSugar_SD19311.Interface
         public Task<List<Categories>> GetCategoriesAsync();
 
         public Task<bool> DeleteCategoryAsync(int categoryId);
+        public Task<Categories?> FindCategoryById(int id);
+        public Task<Categories> UpdateCategoryAsync(Categories category);
     }
 }

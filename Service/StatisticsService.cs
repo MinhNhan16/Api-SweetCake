@@ -1,10 +1,12 @@
 ﻿// Services/StatisticsService.cs
 using ASM_NhomSugar_SD19311.Data;
+using ASM_NhomSugar_SD19311.Interface;
+using ASM_NhomSugar_SD19311.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace ASM_NhomSugar_SD19311.Service // Fixed namespace to match previous context
 {
-    public class StatisticsService
+    public class StatisticsService : IStatisticsService
     {
         private readonly CakeShopDbContext _context;
 
@@ -15,15 +17,13 @@ namespace ASM_NhomSugar_SD19311.Service // Fixed namespace to match previous con
 
         public async Task<decimal> GetTotalRevenueAsync()
         {
-            // Removed HasValue since TotalPrice is decimal (non-nullable)
-            return await _context.Orders
-                .SumAsync(o => o.TotalPrice);
+            return await _context.Orders.SumAsync(o => o.TotalPrice);
         }
 
         public async Task<int> GetTotalCustomersAsync()
         {
             return await _context.Accounts
-                .Where(u => u.Role != null && u.Role.ToLower() == "customer")
+                .Where(a => a.Role != null && a.Role.ToLower() == "customer")
                 .CountAsync();
         }
 
@@ -34,33 +34,41 @@ namespace ASM_NhomSugar_SD19311.Service // Fixed namespace to match previous con
 
         public async Task<Dictionary<string, decimal>> GetRevenueTrendAsync()
         {
-            // Removed HasValue since TotalPrice is decimal (non-nullable)
-            var orders = await _context.Orders
-                .Where(o => o.OrderDate != null)
-                .GroupBy(o => o.OrderDate.ToString("MM-yy"))
-                .Select(g => new { Month = g.Key, Total = g.Sum(o => o.TotalPrice) })
-                .ToDictionaryAsync(g => g.Month, g => g.Total);
+            var result = await _context.Orders
+                .GroupBy(o => new { o.OrderDate.Year, o.OrderDate.Month })
+                .Select(g => new
+                {
+                    MonthYear = $"{g.Key.Month:D2}-{g.Key.Year}", // định dạng MM-yyyy
+                    Total = g.Sum(o => o.TotalPrice)
+                })
+                .ToDictionaryAsync(g => g.MonthYear, g => g.Total);
 
-            return orders ?? new Dictionary<string, decimal>();
+            return result ?? new Dictionary<string, decimal>();
         }
+
+
 
         public async Task<Dictionary<string, int>> GetOrderStatusDistributionAsync()
         {
             var result = await _context.Orders
                 .GroupBy(o => o.OrderStatus)
-                .Select(g => new { Status = g.Key.ToString(), Count = g.Count() })
+                .Select(g => new
+                {
+                    Status = g.Key.ToString(),
+                    Count = g.Count()
+                })
                 .ToDictionaryAsync(g => g.Status, g => g.Count);
 
             return result ?? new Dictionary<string, int>();
         }
 
-        public async Task<List<(string Username, string ProductName, decimal TotalSpent)>> GetTopCustomersAsync(int topN = 5)
+        public async Task<List<TopCustomer>> GetTopCustomersAsync(int topN)
         {
             var result = await _context.Orders
                 .Include(o => o.Customer)
                 .Include(o => o.OrderDetails)
                     .ThenInclude(od => od.Product)
-                .Where(o => o.Customer != null && o.OrderDetails != null)
+                .Where(o => o.Customer != null)
                 .SelectMany(o => o.OrderDetails, (o, od) => new
                 {
                     o.Customer.Username,
@@ -68,39 +76,35 @@ namespace ASM_NhomSugar_SD19311.Service // Fixed namespace to match previous con
                     TotalSpent = od.Price * od.Quantity
                 })
                 .GroupBy(x => new { x.Username, x.ProductName })
-                .Select(g => new
+                .Select(g => new TopCustomer
                 {
-                    g.Key.Username,
-                    g.Key.ProductName,
+                    Username = g.Key.Username,
+                    ProductName = g.Key.ProductName,
                     TotalSpent = g.Sum(x => x.TotalSpent)
                 })
                 .OrderByDescending(x => x.TotalSpent)
                 .Take(topN)
                 .ToListAsync();
 
-            return result
-                .Select(x => (x.Username ?? "Unknown", x.ProductName, x.TotalSpent))
-                .ToList();
+            return result;
         }
 
-        public async Task<List<(string ProductName, int QuantitySold)>> GetTopProductsAsync(int topN = 5)
+        public async Task<List<TopProduct>> GetTopProductsAsync(int topN)
         {
-            var queryResult = await _context.OrderDetails
+            var result = await _context.OrderDetails
                 .Include(od => od.Product)
                 .Where(od => od.Product != null)
                 .GroupBy(od => od.Product.Name)
-                .Select(g => new
+                .Select(g => new TopProduct
                 {
                     ProductName = g.Key,
-                    QuantitySold = g.Sum(od => od.Quantity)
+                    QuantitySold = g.Sum(x => x.Quantity)
                 })
-                .OrderByDescending(g => g.QuantitySold)
+                .OrderByDescending(x => x.QuantitySold)
                 .Take(topN)
                 .ToListAsync();
 
-            return queryResult
-                .Select(g => (g.ProductName, g.QuantitySold))
-                .ToList();
+            return result;
         }
     }
 }

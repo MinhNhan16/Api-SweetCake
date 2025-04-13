@@ -29,6 +29,25 @@ namespace ASM_NhomSugar_SD19311.Service
         {
             return await _categoryRepository.DeleteCategoryAsync(categoryId);
         }
+        public async Task<Categories> UpdateCategoryAsync(UpdateCategoryRequest updateCategoryRequest)
+        {
+            var existingCategory = await _categoryRepository.FindCategoryById(updateCategoryRequest.Id);
+            if (existingCategory == null)
+            {
+                throw new Exception("Danh mục không tồn tại");
+            }
+
+            // Kiểm tra trùng tên (ngoại trừ chính nó)
+            var duplicateCategory = await _categoryRepository.FindCategoryByName(updateCategoryRequest.Name);
+            if (duplicateCategory != null && duplicateCategory.Id != updateCategoryRequest.Id)
+            {
+                throw new Exception("Tên danh mục đã tồn tại");
+            }
+
+            existingCategory.Name = updateCategoryRequest.Name;
+
+            return await _categoryRepository.UpdateCategoryAsync(existingCategory);
+        }
 
         public async Task<List<Categories>> GetCategoriesAsync()
         {

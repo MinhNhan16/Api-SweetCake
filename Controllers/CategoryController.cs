@@ -30,6 +30,12 @@ namespace ASM_NhomSugar_SD19311.Controllers
             return Ok(newCategory);
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateCategoryAsync([FromBody] UpdateCategoryRequest updateCategoryRequest)
+        {
+            var updatedCategory = await _categoryService.UpdateCategoryAsync(updateCategoryRequest);
+            return Ok(updatedCategory);
+        }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategoryAsync([FromRoute] int id)

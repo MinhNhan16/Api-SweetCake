@@ -43,6 +43,18 @@ namespace ASM_NhomSugar_SD19311.Repositories
             return true;
         }
 
+        public async Task<Categories?> FindCategoryById(int id)
+        {
+            return await _dbContext.Categories.FindAsync(id);
+        }
+
+        public async Task<Categories> UpdateCategoryAsync(Categories category)
+        {
+            _dbContext.Categories.Update(category);
+            await _dbContext.SaveChangesAsync();
+            return category;
+        }
+
         public async Task<List<Categories>> GetCategoriesAsync()
         {
             return await _dbContext.Categories.OrderByDescending(c => c.Id).ToListAsync();
