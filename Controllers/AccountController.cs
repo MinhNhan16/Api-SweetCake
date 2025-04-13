@@ -1,7 +1,6 @@
 ﻿using ASM_NhomSugar_SD19311.Data;
 using ASM_NhomSugar_SD19311.DTO;
 using ASM_NhomSugar_SD19311.Model;
-using ASM_NhomSugar_SD19311.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -20,13 +19,11 @@ namespace ASM_NhomSugar_SD19311.Controllers
     {
         private readonly CakeShopDbContext _context;
         private readonly IConfiguration _configuration;
-        private readonly AuthService _authService;
 
-        public AccountController(CakeShopDbContext context, IConfiguration configuration, AuthService authService)
+        public AccountController(CakeShopDbContext context, IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration;
-            _authService = authService;
         }
 
 
@@ -172,7 +169,6 @@ namespace ASM_NhomSugar_SD19311.Controllers
         {
             try
             {
-                await _authService.LogoutAsync();
                 return Ok(new { message = "Đăng xuất thành công!" });
             }
             catch (Exception ex)
