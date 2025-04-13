@@ -1,5 +1,6 @@
-﻿using ApexCharts;
-using ASM_NhomSugar_SD19311.Data;
+﻿using ASM_NhomSugar_SD19311.Data;
+using ASM_NhomSugar_SD19311.Interface;
+using ASM_NhomSugar_SD19311.Repositories;
 using ASM_NhomSugar_SD19311.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -15,9 +16,12 @@ builder.Services.AddScoped<HttpClient>();
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddApexCharts();
 builder.Services.AddScoped<StatisticsService>();
 builder.Services.AddScoped<AccountService>();
+
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+
 builder.Services.AddHttpClient();
 builder.Services.AddLogging(logging =>
 {
@@ -88,7 +92,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
-builder.Services.AddScoped<AuthService>();
+builder.Services.AddDistributedMemoryCache();
 
 var app = builder.Build();
 
