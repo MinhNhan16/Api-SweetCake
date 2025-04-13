@@ -37,6 +37,7 @@ namespace ASM_NhomSugar_SD19311.Model
         [Required]
         [StringLength(200)]
         public string Address { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
         // Navigation properties
         public virtual ICollection<Cart> Carts { get; set; }

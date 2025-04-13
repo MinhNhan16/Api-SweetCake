@@ -37,34 +37,5 @@ namespace ASM_NhomSugar_SD19311.Controllers
 
             return Ok("Product added to cart successfully.");
         }
-        [HttpGet("{customerId}")]
-        public async Task<IActionResult> GetCartByCustomerId(int customerId)
-        {
-            var cart = await _context.Cart
-                .Include(c => c.CartDetails)
-                .ThenInclude(cd => cd.Product)
-                .FirstOrDefaultAsync(c => c.CustomerId == customerId);
-
-            if (cart == null)
-                return NotFound("Không tìm thấy giỏ hàng.");
-
-            var result = new
-            {
-                cart.Id,
-                cart.CustomerId,
-                cart.CreatedDate,
-                Items = cart.CartDetails.Select(cd => new
-                {
-                    cd.ProductId,
-                    cd.Product.Name,
-                    cd.Product.Price,
-                    cd.Quantity,
-                    Total = cd.Product.Price * cd.Quantity
-                })
-            };
-
-            return Ok(result);
-        }
-
     }
 }

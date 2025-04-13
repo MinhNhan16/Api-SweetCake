@@ -128,7 +128,8 @@ namespace ASM_NhomSugar_SD19311.Controllers
                     new SqlParameter("@Email", request.Email),
                     new SqlParameter("@FullName", request.FullName ?? (object)DBNull.Value),
                     new SqlParameter("@Phone", request.Phone ?? (object)DBNull.Value),
-                    new SqlParameter("@Address", request.Address ?? (object)DBNull.Value)
+                    new SqlParameter("@Address", request.Address ?? (object)DBNull.Value),
+                       new SqlParameter("@IsDeleted", false)
                 );
 
                 return Ok(new { message = "Đăng ký thành công!" });
@@ -230,10 +231,18 @@ namespace ASM_NhomSugar_SD19311.Controllers
         [HttpGet]
         public async Task<List<Accounts>> GetAllAccountsAsync()
         {
-            // Truy vấn trực tiếp từ cơ sở dữ liệu hoặc API
-            var accounts = await _context.Accounts.ToListAsync(); // Sử dụng Entity Framework hoặc cách lấy dữ liệu tương ứng
+            var accounts = await _context.Accounts.ToListAsync();
+            return accounts;
+        }
 
-            return accounts; // Trả về danh sách Account
+        [HttpGet("deleted")]
+        public async Task<ActionResult<IEnumerable<Accounts>>> GetDeletedAccounts()
+        {
+            var deletedAccounts = await _context.Accounts
+                .Where(a => a.IsDeleted)
+                .ToListAsync();
+
+            return Ok(deletedAccounts);
         }
 
 
@@ -291,14 +300,44 @@ namespace ASM_NhomSugar_SD19311.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAccount(int id)
         {
-            var account = await _context.Accounts.FindAsync(id);
-            if (account == null) return NotFound("Không tìm thấy tài khoản.");
+            var account = await _context.Accounts
+                .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
+            if (account == null)
+                return NotFound("Không tìm thấy tài khoản.");
 
-            _context.Accounts.Remove(account);
+            account.IsDeleted = true; // Soft delete
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Xoá tài khoản thành công!" });
+            return Ok(new { message = "Xóa tài khoản thành công!" });
         }
 
+        private async Task<int> GetNextAvailableId()
+        {
+            // Find the first deleted account's ID
+            var deletedAccount = await _context.Accounts
+                .Where(a => a.IsDeleted)
+                .OrderBy(a => a.Id)
+                .FirstOrDefaultAsync();
+
+            if (deletedAccount != null)
+            {
+                return deletedAccount.Id;
+            }
+
+            // If no deleted accounts, use the next available ID
+            var maxId = await _context.Accounts.MaxAsync(a => (int?)a.Id) ?? 0;
+            return maxId + 1;
+        }
+        [HttpPost("{id}/restore")]
+        public async Task<IActionResult> RestoreAccount(int id)
+        {
+            var account = await _context.Accounts.FindAsync(id);
+            if (account == null || !account.IsDeleted)
+                return NotFound("Không tìm thấy tài khoản đã xóa.");
+
+            account.IsDeleted = false;
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Khôi phục tài khoản thành công!" });
+        }
     }
 }
