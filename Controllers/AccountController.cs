@@ -235,6 +235,16 @@ namespace ASM_NhomSugar_SD19311.Controllers
             return accounts;
         }
 
+        [HttpGet("active")]
+        public async Task<ActionResult<IEnumerable<Accounts>>> GetActiveAccounts()
+        {
+            var activeAccounts = await _context.Accounts
+                .Where(a => !a.IsDeleted)
+                .ToListAsync();
+
+            return Ok(activeAccounts);
+        }
+
         [HttpGet("deleted")]
         public async Task<ActionResult<IEnumerable<Accounts>>> GetDeletedAccounts()
         {
