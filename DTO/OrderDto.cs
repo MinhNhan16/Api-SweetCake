@@ -2,13 +2,13 @@
 {
     public class OrderDto
     {
-        public int Id { get; set; }
-        public DateTime OrderDate { get; set; }
-        public decimal TotalPrice { get; set; }
-        public string OrderStatus { get; set; }
-        public string CustomerName { get; set; }
-        public string ShipperName { get; set; }
-        public string ProductNames { get; set; } // Danh sách sản phẩm trong đơn hàng
+        public string Id { get; set; } // Mã đơn hàng (PK)
+        public DateTime OrderDate { get; set; } // Ngày đặt hàng
+        public decimal TotalPrice { get; set; } // Tổng giá
+        public string PaymentMode { get; set; } // Phương thức thanh toán
+        public int OrderStatus { get; set; } // Trạng thái đơn hàng
+        public int AccountId { get; set; } // Mã người dùng (FK)
+        public int AddressId { get; set; } // Mã địa chỉ (FK)
 
 
     }
