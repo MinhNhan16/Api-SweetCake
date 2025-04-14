@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASM_NhomSugar_SD19311.Model
 {
-    public class Products
+    public class Product
     {
         [Key]
         public int Id { get; set; }
@@ -25,13 +25,15 @@ namespace ASM_NhomSugar_SD19311.Model
         [Required]
         public int CategoryId { get; set; }
 
-        [StringLength(200)]
+        [StringLength(1000)]
         public string ImagePath { get; set; }
 
         [ForeignKey("CategoryId")]
-        public virtual Categories Category { get; set; }
+        public virtual Categorie Category { get; set; }
 
-        public virtual ICollection<CartDetails> CartDetails { get; set; }
+        public virtual ICollection<CartDetail> CartDetails { get; set; }
         public virtual ICollection<OrderDetails> OrderDetails { get; set; }
+        public virtual ICollection<ProductQuantities> ProductQuantities { get; set; }
+        public virtual ICollection<CartItem> CartItems { get; set; }
     }
 }

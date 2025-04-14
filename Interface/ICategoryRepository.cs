@@ -6,14 +6,14 @@ namespace ASM_NhomSugar_SD19311.Interface
     public interface ICategoryRepository
     {
 
-        public Task<Categories> FindCategoryByName(string categoryName);
+        public Task<Categorie> FindCategoryByName(string categoryName);
 
-        public Task<Categories> CreateCategoryAsync(CreateCategoryRequest createCategoryRequest);
+        public Task<Categorie> CreateCategoryAsync(CreateCategoryRequest createCategoryRequest);
 
-        public Task<List<Categories>> GetCategoriesAsync();
+        public Task<List<Categorie>> GetCategoriesAsync();
 
         public Task<bool> DeleteCategoryAsync(int categoryId);
-        public Task<Categories?> FindCategoryById(int id);
-        public Task<Categories> UpdateCategoryAsync(Categories category);
+        public Task<Categorie?> FindCategoryById(int id);
+        public Task<Categorie> UpdateCategoryAsync(Categorie category);
     }
 }

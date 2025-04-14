@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASM_NhomSugar_SD19311.Model
 {
-    public class Discounts
+    public class Discount
     {
         [Key]
         public int Id { get; set; }
@@ -22,6 +22,6 @@ namespace ASM_NhomSugar_SD19311.Model
         [Required]
         public DateTime EndDate { get; set; }
 
-        public virtual ICollection<Orders> Orders { get; set; }
+        public virtual ICollection<Order> Orders { get; set; }
     }
 }

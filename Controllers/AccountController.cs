@@ -38,7 +38,7 @@ namespace ASM_NhomSugar_SD19311.Controllers
 
             if (googleTokenInfo != null)
             {
-                Accounts existingAccount = await _context.Accounts.Where(x => x.Email == googleTokenInfo.Email).FirstOrDefaultAsync();
+                Account existingAccount = await _context.Accounts.Where(x => x.Email == googleTokenInfo.Email).FirstOrDefaultAsync();
 
                 // chưa tồn tại thì tạo mới
                 if (existingAccount == null)
@@ -203,7 +203,7 @@ namespace ASM_NhomSugar_SD19311.Controllers
         }
 
 
-        private string GenerateJwtToken(Accounts account)
+        private string GenerateJwtToken(Account account)
         {
             var key = Encoding.UTF8.GetBytes("ThisIsAReallyStrongSecretKeyForJWT123!nhanptmps40527@gmail.com");
             var securityKey = new SymmetricSecurityKey(key);
@@ -214,7 +214,8 @@ namespace ASM_NhomSugar_SD19311.Controllers
                 new Claim(ClaimTypes.NameIdentifier, account.Id.ToString()),
                 new Claim(ClaimTypes.Name, account.Username),
                 new Claim(ClaimTypes.Email, account.Email),
-                new Claim(ClaimTypes.Role, account.Role)
+                new Claim(ClaimTypes.Role, account.Role),
+
             };
 
             var token = new JwtSecurityToken(
@@ -229,14 +230,14 @@ namespace ASM_NhomSugar_SD19311.Controllers
 
 
         [HttpGet]
-        public async Task<List<Accounts>> GetAllAccountsAsync()
+        public async Task<List<Account>> GetAllAccountsAsync()
         {
             var accounts = await _context.Accounts.ToListAsync();
             return accounts;
         }
 
         [HttpGet("active")]
-        public async Task<ActionResult<IEnumerable<Accounts>>> GetActiveAccounts()
+        public async Task<ActionResult<IEnumerable<Account>>> GetActiveAccounts()
         {
             var activeAccounts = await _context.Accounts
                 .Where(a => !a.IsDeleted)
@@ -246,7 +247,7 @@ namespace ASM_NhomSugar_SD19311.Controllers
         }
 
         [HttpGet("deleted")]
-        public async Task<ActionResult<IEnumerable<Accounts>>> GetDeletedAccounts()
+        public async Task<ActionResult<IEnumerable<Account>>> GetDeletedAccounts()
         {
             var deletedAccounts = await _context.Accounts
                 .Where(a => a.IsDeleted)
@@ -267,7 +268,7 @@ namespace ASM_NhomSugar_SD19311.Controllers
                 return BadRequest("Username hoặc Email đã tồn tại.");
 
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
-            var account = new Accounts
+            var account = new Account
             {
                 Username = request.Username,
                 Password = hashedPassword,

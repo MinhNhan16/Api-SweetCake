@@ -65,13 +65,13 @@ namespace ASM_NhomSugar_SD19311.Service // Fixed namespace to match previous con
         public async Task<List<TopCustomer>> GetTopCustomersAsync(int topN)
         {
             var result = await _context.Orders
-                .Include(o => o.Customer)
+                .Include(o => o.Account)
                 .Include(o => o.OrderDetails)
                     .ThenInclude(od => od.Product)
-                .Where(o => o.Customer != null)
+                .Where(o => o.Account != null)
                 .SelectMany(o => o.OrderDetails, (o, od) => new
                 {
-                    o.Customer.Username,
+                    o.Account.Username,
                     ProductName = od.Product != null ? od.Product.Name : "Unknown",
                     TotalSpent = od.Price * od.Quantity
                 })

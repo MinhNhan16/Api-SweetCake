@@ -6,24 +6,30 @@ namespace ASM_NhomSugar_SD19311.Model
     public class OrderDetails
     {
         [Key]
-        [Column(Order = 0)]
-        public int OrderId { get; set; }
-
-        [Key]
-        [Column(Order = 1)]
-        public int ProductId { get; set; }
+        [StringLength(150)]
+        public string Id { get; set; } // Mã đơn hàng (PK)
 
         [Required]
-        public int Quantity { get; set; }
+        public int Quantity { get; set; } // Số lượng
+
+        [Required]
+        public int Size { get; set; } // Kích cỡ
 
         [Required]
         [Column(TypeName = "decimal(18,0)")]
-        public decimal Price { get; set; }
+        public decimal Price { get; set; } // Giá
 
+        [Required]
+        public float TotalPrice { get; set; } // Tổng giá
+
+        [Required]
+        [StringLength(150)]
+        public string OrderId { get; set; } // Mã đơn hàng (FK từ Order)
         [ForeignKey("OrderId")]
-        public virtual Orders Order { get; set; }
-
+        public Order Order { get; set; }
+        [Required]
+        public int ProductId { get; set; }
         [ForeignKey("ProductId")]
-        public virtual Products Product { get; set; }
+        public Product Product { get; set; }
     }
 }

@@ -14,14 +14,14 @@ namespace ASM_NhomSugar_SD19311.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<Categories> FindCategoryByName(string categoryName)
+        public async Task<Categorie> FindCategoryByName(string categoryName)
         {
             return await _dbContext.Categories.FirstOrDefaultAsync(x => x.Name.ToLower() == categoryName.ToLower());
         }
 
-        public async Task<Categories> CreateCategoryAsync(CreateCategoryRequest createCategoryRequest)
+        public async Task<Categorie> CreateCategoryAsync(CreateCategoryRequest createCategoryRequest)
         {
-            var result = await _dbContext.Categories.AddAsync(new Categories
+            var result = await _dbContext.Categories.AddAsync(new Categorie
             {
                 Name = createCategoryRequest.Name,
             });
@@ -43,19 +43,19 @@ namespace ASM_NhomSugar_SD19311.Repositories
             return true;
         }
 
-        public async Task<Categories?> FindCategoryById(int id)
+        public async Task<Categorie?> FindCategoryById(int id)
         {
             return await _dbContext.Categories.FindAsync(id);
         }
 
-        public async Task<Categories> UpdateCategoryAsync(Categories category)
+        public async Task<Categorie> UpdateCategoryAsync(Categorie category)
         {
             _dbContext.Categories.Update(category);
             await _dbContext.SaveChangesAsync();
             return category;
         }
 
-        public async Task<List<Categories>> GetCategoriesAsync()
+        public async Task<List<Categorie>> GetCategoriesAsync()
         {
             return await _dbContext.Categories.OrderByDescending(c => c.Id).ToListAsync();
         }

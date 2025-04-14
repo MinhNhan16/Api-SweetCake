@@ -2,7 +2,7 @@
 
 namespace ASM_NhomSugar_SD19311.Model
 {
-    public class Categories
+    public class Categorie
     {
         [Key]
         public int Id { get; set; }
@@ -11,6 +11,6 @@ namespace ASM_NhomSugar_SD19311.Model
         [StringLength(100)]
         public string Name { get; set; }
 
-        public virtual ICollection<Products> Products { get; set; }
+        public virtual ICollection<Product> Products { get; set; }
     }
 }

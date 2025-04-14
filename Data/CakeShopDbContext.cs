@@ -6,64 +6,160 @@ namespace ASM_NhomSugar_SD19311.Data
     public class CakeShopDbContext : DbContext
     {
         public CakeShopDbContext(DbContextOptions<CakeShopDbContext> options) : base(options) { }
-        public DbSet<Accounts> Accounts { get; set; }
-        public DbSet<Categories> Categories { get; set; }
-        public DbSet<Products> Products { get; set; }
-        public DbSet<Discounts> Discounts { get; set; }
-        public DbSet<Cart> Cart { get; set; }
-        public DbSet<CartDetails> CartDetails { get; set; }
-        public DbSet<Orders> Orders { get; set; }
+
+        public DbSet<Account> Accounts { get; set; }
+        public DbSet<Address> Addresses { get; set; }
+        public DbSet<Categorie> Categories { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<Discount> Discounts { get; set; }
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<CartDetail> CartDetails { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetails> OrderDetails { get; set; }
-        public DbSet<Chats> Chats { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<ProductColor> ProductColors { get; set; }
+        public DbSet<ProductSize> ProductSizes { get; set; }
+        public DbSet<ProductQuantities> ProductQuantities { get; set; }
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<CartDetails>()
-                 .HasKey(cd => new { cd.CartId, cd.ProductId });
+            // Account relationships
+            modelBuilder.Entity<Account>()
+                .HasMany(a => a.CartItems)
+                .WithOne(ci => ci.Account)
+                .HasForeignKey(ci => ci.AccountId);
 
-            modelBuilder.Entity<OrderDetails>()
-                .HasKey(od => new { od.OrderId, od.ProductId });
+            modelBuilder.Entity<Account>()
+                .HasMany(a => a.Carts)
+                .WithOne(c => c.Account)
+                .HasForeignKey(c => c.AccountId);
 
-            // Định nghĩa ràng buộc UNIQUE
-            modelBuilder.Entity<Accounts>()
-                .HasIndex(a => a.Username)
-                .IsUnique();
+            modelBuilder.Entity<Account>()
+                .HasMany(a => a.Orders)
+                .WithOne(o => o.Account)
+                .HasForeignKey(o => o.AccountId);
 
-            modelBuilder.Entity<Accounts>()
-                .HasIndex(a => a.Email)
-                .IsUnique();
+            modelBuilder.Entity<Account>()
+                .HasMany(a => a.Addresses)
+                .WithOne(ad => ad.Account)
+                .HasForeignKey(ad => ad.AccountId);
 
-            modelBuilder.Entity<Discounts>()
-                .HasIndex(d => d.Code)
-                .IsUnique();
+            modelBuilder.Entity<Account>()
+                .HasMany(a => a.Notifications)
+                .WithOne(n => n.Account)
+                .HasForeignKey(n => n.AccountId);
 
-            // Cấu hình mối quan hệ giữa Accounts và Orders
-            modelBuilder.Entity<Orders>()
-                .HasOne(o => o.Customer)
-                .WithMany(a => a.CustomerOrders)
-                .HasForeignKey(o => o.CustomerId)
+            // Address relationships
+            modelBuilder.Entity<Address>()
+                .HasMany(ad => ad.Carts)
+                .WithOne(c => c.Address)
+                .HasForeignKey(c => c.AddressId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Orders>()
-                .HasOne(o => o.Shipper)
-                .WithMany(a => a.ShipperOrders)
-                .HasForeignKey(o => o.ShipperId)
-                .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<Address>()
+                .HasMany(ad => ad.Orders)
+                .WithOne(o => o.Address)
+                .HasForeignKey(o => o.AddressId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Cấu hình mối quan hệ giữa Accounts và Chats
-            // 1. Mối quan hệ 1-nhiều: Accounts (Sender) -> Chats
-            modelBuilder.Entity<Chats>()
-                .HasOne(c => c.Sender)              // Chats có một Sender
-                .WithMany(a => a.SentChats)         // Accounts có nhiều SentChats
-                .HasForeignKey(c => c.SenderId)     // Khóa ngoại là SenderId
-                .OnDelete(DeleteBehavior.Restrict); // Không cho xóa nếu có tin nhắn liên quan
+            // Cart relationships
+            modelBuilder.Entity<Cart>()
+                .HasMany(c => c.CartDetails)
+                .WithOne(cd => cd.Cart)
+                .HasForeignKey(cd => cd.CartId);
 
-            // 2. Mối quan hệ 1-nhiều: Accounts (Receiver) -> Chats
-            modelBuilder.Entity<Chats>()
-                .HasOne(c => c.Receiver)            // Chats có một Receiver
-                .WithMany(a => a.ReceivedChats)     // Accounts có nhiều ReceivedChats
-                .HasForeignKey(c => c.ReceiverId)   // Khóa ngoại là ReceiverId
-                .OnDelete(DeleteBehavior.Restrict); // Không cho xóa nếu có tin nhắn liên quan
+            modelBuilder.Entity<Cart>()
+                .HasOne(c => c.ProductSize)
+                .WithMany()
+                .HasForeignKey(c => c.SizeId);
+
+            modelBuilder.Entity<Cart>()
+                .HasOne(c => c.Product)
+                .WithMany()
+                .HasForeignKey(c => c.ProductId)
+                .OnDelete(DeleteBehavior.Restrict); // Prevent cascading deletes
+
+            // CartDetail relationships (Composite Key)
+            modelBuilder.Entity<CartDetail>()
+                .HasKey(cd => new { cd.CartId, cd.ProductId });
+
+            modelBuilder.Entity<CartDetail>()
+                .HasOne(cd => cd.Product)
+                .WithMany(p => p.CartDetails)
+                .HasForeignKey(cd => cd.ProductId)
+                .OnDelete(DeleteBehavior.Restrict); // Prevent cascading deletes
+
+            // Category relationships
+            modelBuilder.Entity<Categorie>()
+                .HasMany(c => c.Products)
+                .WithOne(p => p.Category)
+                .HasForeignKey(p => p.CategoryId);
+
+            // Discount relationships
+            modelBuilder.Entity<Discount>()
+                .HasMany(d => d.Orders)
+                .WithMany();
+
+            // Order relationships
+            modelBuilder.Entity<Order>()
+                .HasMany(o => o.OrderDetails)
+                .WithOne(od => od.Order)
+                .HasForeignKey(od => od.OrderId);
+
+            // OrderDetails relationships
+            modelBuilder.Entity<OrderDetails>()
+                .HasOne(od => od.Product)
+                .WithMany(p => p.OrderDetails)
+                .HasForeignKey(od => od.ProductId);
+
+            // Product relationships
+            modelBuilder.Entity<Product>()
+                .HasMany(p => p.ProductQuantities)
+                .WithOne(pq => pq.Product)
+                .HasForeignKey(pq => pq.ProductId);
+
+            // ProductQuantities relationships
+            modelBuilder.Entity<ProductQuantities>()
+                .HasOne(pq => pq.Size)
+                .WithMany()
+                .HasForeignKey(pq => pq.SizeId);
+
+            modelBuilder.Entity<ProductQuantities>()
+                .HasOne(pq => pq.Color)
+                .WithMany()
+                .HasForeignKey(pq => pq.ColorId);
+
+            // Configure decimal precision
+            modelBuilder.Entity<Cart>()
+                .Property(c => c.Price)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Cart>()
+                .Property(c => c.TotalPrice)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<CartDetail>()
+                .Property(cd => cd.Price)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Order>()
+                .Property(o => o.TotalPrice)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<OrderDetails>()
+                .Property(od => od.Price)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Product>()
+                .Property(p => p.Price)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Discount>()
+                .Property(d => d.DiscountValue)
+                .HasPrecision(5, 2);
         }
     }
 }

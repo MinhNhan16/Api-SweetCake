@@ -60,7 +60,7 @@ namespace ASM_NhomSugar_SD19311.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateProduct([FromBody] ProductDto dto)
         {
-            var p = new Products
+            var p = new Product
             {
                 Name = dto.Name,
                 Description = dto.Description,

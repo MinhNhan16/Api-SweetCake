@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASM_NhomSugar_SD19311.Model
 {
-    public class CartDetails
+    public class CartDetail
     {
         [Key]
         [Column(Order = 0)]
@@ -24,6 +24,6 @@ namespace ASM_NhomSugar_SD19311.Model
         public virtual Cart Cart { get; set; }
 
         [ForeignKey("ProductId")]
-        public virtual Products Product { get; set; }
+        public virtual Product Product { get; set; }
     }
 }

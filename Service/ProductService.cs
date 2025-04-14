@@ -13,34 +13,34 @@ namespace ASM_NhomSugar_SD19311.Service
         }
 
         // Lấy tất cả sản phẩm
-        public async Task<List<Products>> GetAllProductsAsync()
+        public async Task<List<Product>> GetAllProductsAsync()
         {
             try
             {
                 var response = await _httpClient.GetAsync("https://localhost:44366/api/account/");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<List<Products>>();
+                    return await response.Content.ReadFromJsonAsync<List<Product>>();
                 }
-                return new List<Products>(); // Trả về danh sách rỗng nếu không thành công
+                return new List<Product>(); // Trả về danh sách rỗng nếu không thành công
             }
             catch (Exception ex)
             {
                 // Có thể thêm logging ở đây nếu cần
                 Console.WriteLine($"Error in GetAllProductsAsync: {ex.Message}");
-                return new List<Products>();
+                return new List<Product>();
             }
         }
 
         // Lấy sản phẩm theo ID
-        public async Task<Products> GetProductByIdAsync(int id)
+        public async Task<Product> GetProductByIdAsync(int id)
         {
             try
             {
                 var response = await _httpClient.GetAsync($"https://localhost:44366/api/account/{id}");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<Products>();
+                    return await response.Content.ReadFromJsonAsync<Product>();
                 }
                 return null; // Trả về null nếu không tìm thấy sản phẩm
             }
@@ -52,7 +52,7 @@ namespace ASM_NhomSugar_SD19311.Service
         }
 
         // Tạo sản phẩm mới
-        public async Task<bool> CreateProductAsync(Products product)
+        public async Task<bool> CreateProductAsync(Product product)
         {
             try
             {
@@ -67,7 +67,7 @@ namespace ASM_NhomSugar_SD19311.Service
         }
 
         // Cập nhật sản phẩm
-        public async Task<bool> UpdateProductAsync(int id, Products product)
+        public async Task<bool> UpdateProductAsync(int id, Product product)
         {
             try
             {

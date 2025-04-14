@@ -12,7 +12,7 @@ namespace ASM_NhomSugar_SD19311.Service
             _categoryRepository = categoryRepository;
         }
 
-        public async Task<Categories> CreateCategoryAsync(CreateCategoryRequest createCategoryRequest)
+        public async Task<Categorie> CreateCategoryAsync(CreateCategoryRequest createCategoryRequest)
         {
 
             var existingCategory = await _categoryRepository.FindCategoryByName(createCategoryRequest.Name);
@@ -29,7 +29,7 @@ namespace ASM_NhomSugar_SD19311.Service
         {
             return await _categoryRepository.DeleteCategoryAsync(categoryId);
         }
-        public async Task<Categories> UpdateCategoryAsync(UpdateCategoryRequest updateCategoryRequest)
+        public async Task<Categorie> UpdateCategoryAsync(UpdateCategoryRequest updateCategoryRequest)
         {
             var existingCategory = await _categoryRepository.FindCategoryById(updateCategoryRequest.Id);
             if (existingCategory == null)
@@ -49,7 +49,7 @@ namespace ASM_NhomSugar_SD19311.Service
             return await _categoryRepository.UpdateCategoryAsync(existingCategory);
         }
 
-        public async Task<List<Categories>> GetCategoriesAsync()
+        public async Task<List<Categorie>> GetCategoriesAsync()
         {
             return await _categoryRepository.GetCategoriesAsync();
         }

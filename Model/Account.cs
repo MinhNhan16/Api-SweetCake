@@ -2,7 +2,7 @@
 
 namespace ASM_NhomSugar_SD19311.Model
 {
-    public class Accounts
+    public class Account
     {
         [Key]
         public int Id { get; set; }
@@ -39,11 +39,11 @@ namespace ASM_NhomSugar_SD19311.Model
         public string Address { get; set; }
         public bool IsDeleted { get; set; } = false;
 
-        // Navigation properties
+
+        public virtual ICollection<CartItem> CartItems { get; set; }
         public virtual ICollection<Cart> Carts { get; set; }
-        public virtual ICollection<Orders> CustomerOrders { get; set; }
-        public virtual ICollection<Orders> ShipperOrders { get; set; }
-        public virtual ICollection<Chats> SentChats { get; set; }
-        public virtual ICollection<Chats> ReceivedChats { get; set; }
+        public virtual ICollection<Order> Orders { get; set; }
+        public virtual ICollection<Address> Addresses { get; set; }
+        public virtual ICollection<Notification> Notifications { get; set; }
     }
 }

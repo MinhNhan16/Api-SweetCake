@@ -5,24 +5,24 @@ namespace ASM_NhomSugar_SD19311.Interface
 {
     public interface IProductOrderService
     {
-        Task<IEnumerable<Products>> GetProductsAsync();
-        Task<Products> GetProductAsync(int id);
-        Task<Products> AddProductAsync(Products product);
-        Task UpdateProductAsync(int id, Products product);
+        Task<IEnumerable<Product>> GetProductsAsync();
+        Task<Product> GetProductAsync(int id);
+        Task<Product> AddProductAsync(Product product);
+        Task UpdateProductAsync(int id, Product product);
         Task DeleteProductAsync(int id);
 
-        Task<IEnumerable<Orders>> GetOrdersAsync();
-        Task<Orders> GetOrderAsync(int id);
-        Task<Orders> AddOrderAsync(Orders order);
+        Task<IEnumerable<Order>> GetOrdersAsync();
+        Task<Order> GetOrderAsync(int id);
+        Task<Order> AddOrderAsync(Order order);
         Task UpdateOrderStatusAsync(int id, OrderStatus status);
         Task DeleteOrderAsync(int id);
 
         Task<Cart> GetCartAsync(int customerId);
-        Task AddToCartAsync(int customerId, CartDetails cartDetail);
-        Task UpdateCartAsync(int customerId, CartDetails cartDetail);
+        Task AddToCartAsync(int customerId, CartDetail cartDetail);
+        Task UpdateCartAsync(int customerId, CartDetail cartDetail);
         Task RemoveFromCartAsync(int customerId, int productId);
 
         Task<(int OrderId, decimal TotalPrice)> CheckoutCartAsync(int customerId, int? discountId = null);
-        Task<IEnumerable<Products>> SearchAndFilterProductsAsync(string name, decimal? minPrice, decimal? maxPrice, int? categoryId);
+        Task<IEnumerable<Product>> SearchAndFilterProductsAsync(string name, decimal? minPrice, decimal? maxPrice, int? categoryId);
     }
 }
