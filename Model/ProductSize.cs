@@ -8,6 +8,6 @@ namespace ASM_NhomSugar_SD19311.Model
         public int Id { get; set; } // Mã kích cỡ (PK)
 
         [Required]
-        public int Size { get; set; } // Tên kích cỡ (ví dụ: S, M, L)
+        public string Size { get; set; } // Tên kích cỡ (ví dụ: S, M, L)
     }
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ASM_NhomSugar_SD19311.Migrations
 {
     [DbContext(typeof(CakeShopDbContext))]
-    [Migration("20250414150326_Table")]
-    partial class Table
+    [Migration("20250414164317_Tale")]
+    partial class Tale
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -477,8 +477,9 @@ namespace ASM_NhomSugar_SD19311.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Size")
-                        .HasColumnType("int");
+                    b.Property<string>("Size")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
