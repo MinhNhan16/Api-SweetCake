@@ -350,5 +350,91 @@ namespace ASM_NhomSugar_SD19311.Controllers
             await _context.SaveChangesAsync();
             return Ok(new { message = "Khôi phục tài khoản thành công!" });
         }
+        [HttpPut("update-profile/{accountId}")]
+        public async Task<IActionResult> UpdateProfile(int accountId, [FromBody] ProfileUpdateDto profileUpdateDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Tìm tài khoản theo accountId, bao gồm Addresses
+            var account = await _context.Accounts
+                .Include(a => a.Addresses)
+                .FirstOrDefaultAsync(a => a.Id == accountId);
+
+            if (account == null)
+            {
+                return NotFound(new { Message = "Account not found" });
+            }
+
+            // Cập nhật thông tin tài khoản
+            account.Username = profileUpdateDto.Username ?? account.Username;
+            account.Email = profileUpdateDto.Email ?? account.Email;
+            account.FullName = profileUpdateDto.FullName ?? account.FullName;
+            account.Phone = profileUpdateDto.Phone ?? account.Phone;
+
+            // Cập nhật hoặc tạo mới địa chỉ trong Addresses
+            var address = account.Addresses?.FirstOrDefault();
+            if (address == null)
+            {
+                address = new Address
+                {
+                    AccountId = accountId
+                };
+                account.Addresses = account.Addresses ?? new List<Address>();
+                account.Addresses.Add(address);
+                _context.Addresses.Add(address);
+            }
+
+            // Cập nhật thông tin địa chỉ
+            address.Street = profileUpdateDto.Street ?? address.Street;
+            address.City = profileUpdateDto.City ?? address.City;
+            address.State = profileUpdateDto.State ?? address.State;
+            address.Country = profileUpdateDto.Country ?? address.Country;
+
+            // Cập nhật trường Address (string) trong Account
+            account.Address = $"{address.Street}, {address.City}, {address.State}, {address.Country}".Trim();
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return Ok(new { Message = "Profile updated successfully" });
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while updating the profile", Error = ex.Message });
+            }
+        }
+        [HttpGet("profile/{id}")]
+        public async Task<IActionResult> GetProfileById(int id)
+        {
+            var account = await _context.Accounts
+                .Include(a => a.Addresses)  // Include thông tin địa chỉ
+                .FirstOrDefaultAsync(a => a.Id == id);
+
+            if (account == null)
+            {
+                return NotFound();
+            }
+
+            // Lấy địa chỉ đầu tiên nếu có, hoặc null nếu không có địa chỉ
+            var address = account.Addresses.FirstOrDefault();
+
+            var profile = new ProfileUpdateDto
+            {
+                Username = account.Username,
+                Email = account.Email,
+                FullName = account.FullName,
+                Phone = account.Phone,
+                Street = address?.Street,  // Kiểm tra nếu địa chỉ tồn tại
+                City = address?.City,
+                State = address?.State,
+                Country = address?.Country
+            };
+
+            return Ok(profile);
+        }
+
     }
 }
