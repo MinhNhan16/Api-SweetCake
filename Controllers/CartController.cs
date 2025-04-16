@@ -1,7 +1,6 @@
-﻿using ASM_NhomSugar_SD19311.Data;
-using ASM_NhomSugar_SD19311.DTO;
+﻿using ASM_NhomSugar_SD19311.DTO;
+using ASM_NhomSugar_SD19311.Interface;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ASM_NhomSugar_SD19311.Controllers
 {
@@ -9,33 +8,100 @@ namespace ASM_NhomSugar_SD19311.Controllers
     [Route("api/cart")]
     public class CartController : ControllerBase
     {
-        private readonly CakeShopDbContext _context;
+        private readonly ICartService _cartService;
 
-        public CartController(CakeShopDbContext context)
+        public CartController(ICartService cartService)
         {
-            _context = context;
+            _cartService = cartService;
         }
 
-        [HttpPost("add")]
-        public async Task<IActionResult> AddToCart([FromBody] AddToCartRequest request)
+        // Lấy giỏ hàng của người dùng theo AccountId
+        [HttpGet("user/{accountId}")]
+        public async Task<ActionResult<List<CartDto>>> GetCartsByAccountIdAsync(int accountId)
         {
-            var customer = await _context.Accounts.FindAsync(request.CustomerId);
-            if (customer == null)
+            var carts = await _cartService.GetAllByAccountIdAsync(accountId);
+            if (carts == null || carts.Count == 0)
             {
-                return BadRequest("Customer not found.");
+                return NotFound("Giỏ hàng không tồn tại.");
+            }
+            return Ok(carts);
+        }
+
+        // Lấy giỏ hàng theo ID
+        [HttpGet("{id}")]
+        public async Task<ActionResult<CartDto>> GetCartByIdAsync(int id)
+        {
+            var cart = await _cartService.GetByIdAsync(id);
+            if (cart == null)
+            {
+                return NotFound($"Giỏ hàng với ID {id} không tồn tại.");
+            }
+            return Ok(cart);
+        }
+
+        // Tạo giỏ hàng mới
+        [HttpPost]
+        public async Task<ActionResult> CreateCartAsync([FromBody] CartDto cartDto)
+        {
+            try
+            {
+                if (cartDto == null)
+                {
+                    return BadRequest("Dữ liệu giỏ hàng không hợp lệ.");
+                }
+
+                int newCartId = await _cartService.CreateAsync(cartDto);
+                if (newCartId <= 0)
+                {
+                    return StatusCode(500, "Không thể lấy ID của giỏ hàng mới.");
+                }
+
+                cartDto.Id = newCartId; // Gán ID mới cho cartDto
+                return Ok(cartDto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi khi tạo giỏ hàng: {ex.Message}");
+            }
+        }
+
+        // Cập nhật giỏ hàng
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateCartAsync(int id, [FromBody] CartDto cartDto)
+        {
+            if (cartDto == null || id != cartDto.Id)
+            {
+                return BadRequest("Dữ liệu giỏ hàng không hợp lệ.");
             }
 
-            var product = await _context.Products.FindAsync(request.ProductId);
-            if (product == null)
+            try
             {
-                return BadRequest("Product not found.");
+                var result = await _cartService.UpdateAsync(cartDto);
+                if (result)
+                {
+                    return NoContent();
+                }
+
+                return StatusCode(500, "Đã có lỗi xảy ra khi cập nhật giỏ hàng.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi hệ thống: {ex.Message}");
+            }
+        }
+
+
+        // Xóa giỏ hàng
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteCartAsync(int id)
+        {
+            var result = await _cartService.DeleteAsync(id);
+            if (result)
+            {
+                return NoContent(); // Xóa thành công
             }
 
-            // Gọi stored procedure AddToCart để thêm sản phẩm vào giỏ hàng
-            await _context.Database.ExecuteSqlRawAsync("EXEC AddToCart @CustomerId = {0}, @ProductId = {1}, @Quantity = {2}",
-                request.CustomerId, request.ProductId, request.Quantity);
-
-            return Ok("Product added to cart successfully.");
+            return NotFound($"Giỏ hàng với ID {id} không tồn tại.");
         }
     }
 }

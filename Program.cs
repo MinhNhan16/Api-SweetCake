@@ -18,8 +18,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<StatisticsService>();
 builder.Services.AddScoped<AccountService>();
+builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IStatisticsService, StatisticsService>();
-
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 
