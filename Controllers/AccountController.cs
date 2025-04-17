@@ -292,6 +292,8 @@ namespace ASM_NhomSugar_SD19311.Controllers
             var account = await _context.Accounts.FindAsync(id);
             if (account == null) return NotFound("Không tìm thấy tài khoản.");
 
+            account.Username = request.Username;
+            account.Email = request.Email;
             account.FullName = request.FullName;
             account.Phone = request.Phone;
             account.Address = request.Address;
