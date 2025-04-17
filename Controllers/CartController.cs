@@ -1,4 +1,5 @@
-﻿using ASM_NhomSugar_SD19311.DTO;
+﻿using ASM_NhomSugar_SD19311.Common;
+using ASM_NhomSugar_SD19311.DTO;
 using ASM_NhomSugar_SD19311.Interface;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,7 +7,7 @@ namespace ASM_NhomSugar_SD19311.Controllers
 {
     [ApiController]
     [Route("api/cart")]
-    public class CartController : ControllerBase
+    public class CartController : BaseSecureController
     {
         private readonly ICartService _cartService;
 
@@ -22,7 +23,7 @@ namespace ASM_NhomSugar_SD19311.Controllers
             var carts = await _cartService.GetAllByAccountIdAsync(accountId);
             if (carts == null || carts.Count == 0)
             {
-                return NotFound("Giỏ hàng không tồn tại.");
+                return Ok(new List<CartDto>()); // Trả về danh sách rỗng nếu không có giỏ hàng
             }
             return Ok(carts);
         }
@@ -31,6 +32,7 @@ namespace ASM_NhomSugar_SD19311.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<CartDto>> GetCartByIdAsync(int id)
         {
+            Console.WriteLine(this.CurrentUser);
             var cart = await _cartService.GetByIdAsync(id);
             if (cart == null)
             {
@@ -40,7 +42,7 @@ namespace ASM_NhomSugar_SD19311.Controllers
         }
 
         // Tạo giỏ hàng mới
-        [HttpPost]
+        [HttpPost()]
         public async Task<ActionResult> CreateCartAsync([FromBody] CartDto cartDto)
         {
             try

@@ -41,7 +41,7 @@ namespace ASM_NhomSugar_SD19311.Service
         public async Task<List<CartDto>> GetAllByAccountIdAsync(int accountId)
         {
             return await _context.Carts
-                .Where(c => c.AccountId == accountId)
+                .Where(c => c.AccountId == accountId && !c.IsCheckout)
                 .Select(c => new CartDto
                 {
                     Id = c.Id,
@@ -111,7 +111,10 @@ namespace ASM_NhomSugar_SD19311.Service
                     .FirstOrDefaultAsync(c =>
                         c.ProductId == cartDto.ProductId &&
                         c.AccountId == cartDto.AccountId &&
-                        c.SizeId == cartDto.SizeId);
+                        c.SizeId == cartDto.SizeId &&
+                        !c.IsCheckout
+
+                        );
 
                 int newCartId;
 

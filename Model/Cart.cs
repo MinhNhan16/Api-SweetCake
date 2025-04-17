@@ -54,5 +54,7 @@ namespace ASM_NhomSugar_SD19311.Model
         [ForeignKey("ProductId")]
         public Product Product { get; set; }
         public virtual ICollection<CartDetail> CartDetails { get; set; }
+
+        public bool IsCheckout { get; set; } = false;
     }
 }

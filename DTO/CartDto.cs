@@ -7,7 +7,7 @@
         public int Size { get; set; } // Kích cỡ
         public int CheckoutCount { get; set; } // Số lượng bán
         public decimal Price { get; set; } // Giá
-        public string PaymentMode { get; set; } // Phương thức thanh toán
+        public string? PaymentMode { get; set; } // Phương thức thanh toán
         public DateTime DateCreated { get; set; } // Ngày tạo
         public decimal TotalPrice { get; set; } // Tổng giá
         public float PayPalPayment { get; set; } // Tổng tiền thanh toán PayPal
@@ -15,5 +15,6 @@
         public int AddressId { get; set; } // Mã địa chỉ (FK)
         public int SizeId { get; set; } // Mã kích cỡ (FK
         public int ProductId { get; set; } // Mã sản phẩm (FK)
+        public List<CartItemDto> CartItems { get; set; } = new List<CartItemDto>();
     }
 }

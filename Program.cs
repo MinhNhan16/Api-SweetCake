@@ -79,19 +79,16 @@ builder.Services.AddAuthentication(options =>
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(key),
         ValidateIssuer = false,
         ValidateAudience = false,
-        RequireExpirationTime = true,
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero
+        ValidateLifetime = false,
+        ValidateIssuerSigningKey = true,
     };
 });
 
-
-
 builder.Services.AddAuthorization();
+
 builder.Services.AddControllers();
 builder.Services.AddDistributedMemoryCache();
 
@@ -109,9 +106,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowBlazorClient");
 app.UseRouting();
+
+app.UseStaticFiles();
+
+
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseStaticFiles();
 app.MapControllers();
 
 

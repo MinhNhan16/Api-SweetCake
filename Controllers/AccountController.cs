@@ -208,6 +208,7 @@ namespace ASM_NhomSugar_SD19311.Controllers
             var key = Encoding.UTF8.GetBytes("ThisIsAReallyStrongSecretKeyForJWT123!nhanptmps40527@gmail.com");
             var securityKey = new SymmetricSecurityKey(key);
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
             var claims = new[]
             {
@@ -215,14 +216,14 @@ namespace ASM_NhomSugar_SD19311.Controllers
                 new Claim(ClaimTypes.Name, account.Username),
                 new Claim(ClaimTypes.Email, account.Email),
                 new Claim(ClaimTypes.Role, account.Role),
-
+                new Claim(JwtRegisteredClaimNames.Iat, now.ToString(), ClaimValueTypes.Integer64),
             };
 
             var token = new JwtSecurityToken(
                 issuer: null,
                 audience: null,
                 claims: claims,
-                expires: DateTime.Now.AddHours(1),
+                expires: DateTime.Now.AddHours(10),
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
